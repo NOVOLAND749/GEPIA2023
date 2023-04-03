@@ -1,13 +1,12 @@
-import os
-from typing import Optional, Union, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 
 import numpy as np
-import pandas as pd
 import pymongo
 
 Document = Dict[str, Any]
 Query = Dict[str, Any]
 Update = Dict[str, Any]
+
 
 class Database(object):
     def __init__(self, db_name: str, collection_name: str) -> None:
@@ -50,3 +49,114 @@ class Database(object):
 
     def list_indexes(self) -> Any:
         return self.collection.list_indexes()
+
+
+class DatabaseAPI(Database):
+    def __init__(self, db_name: str, collection_name: str) -> None:
+        super().__init__(db_name, collection_name)
+
+    """
+    write methods:
+    
+    write_table_obs_by_var : write obs_by_var data into database
+    
+    write_table_gene_by_var : write gene_by_var data into database
+    
+    write_metadata : write metadata into database
+    """
+
+    def write_table_obs_by_var(self,
+                               matrix: np.ndarray,
+                               overwrite: bool = False,
+                               verbose: bool = True) -> Optional[str]:
+        collection_name = "obs_by_var_table"
+        if collection_name in self.db.list_collection_names() and not overwrite:
+            alarming = "Collection already exists, to overwrite it please use overwrite = True"
+            if verbose:
+                print(alarming)
+            return (alarming)
+        if collection_name in self.db.list_collection_names() and overwrite:
+            self.db.drop_collection(collection_name)
+
+        self.collection = self.db[collection_name]
+        documents = []
+        num_of_documents = 0
+        for i in range(matrix.shape[0]):
+            document = {
+                "obs_id": i,
+                "obs_value": matrix[i]
+            }
+            documents.append(document)
+            num_of_documents += 1
+
+        self.insert_many(documents)
+
+        self.create_index(["obs_id", pymongo.ASCENDING], unique=True)
+
+        msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
+        return (msg)
+
+    def write_table_gene_by_var(self,
+                                matrix: np.ndarray,
+                                overwrite: bool = False,
+                                genes: List[Optional[str]] = [],
+                                verbose: bool = True) -> Optional[str]:
+        collection_name = "gene_by_var_table"
+        if collection_name in self.db.list_collection_names() and not overwrite:
+            alarming = "Collection already exists, to overwrite it please use overwrite = True"
+            if verbose:
+                print(alarming)
+            return (alarming)
+        if collection_name in self.db.list_collection_names() and overwrite:
+            self.db.drop_collection(collection_name)
+
+        self.collection = self.db[collection_name]
+        documents = []
+        num_of_documents = 0
+        for i in range(matrix.shape[0]):
+            document = {
+                "gene_id": genes[i],
+                "gene_value": matrix[i]
+            }
+            documents.append(document)
+            num_of_documents += 1
+
+        self.insert_many(documents)
+
+        self.create_index(["gene_id", pymongo.ASCENDING], unique=True)
+
+        msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
+        return (msg)
+
+    # default write method is to append the metadata
+    def write_metadata(self,
+                       metadata: Optional[Dict[str, list]] = None,
+                       overwrite: bool = False,
+                       verbose: bool = True) -> Optional[str]:
+        collection_name = "metadata"
+        if collection_name in self.db.list_collection_names() and overwrite:
+            self.db.drop_collection(collection_name)
+            self.collection = self.db[collection_name]
+        if collection_name not in self.db.list_collection_names():
+            self.collection = self.db[collection_name]
+
+        documents = []
+        num_of_documents = 0
+        for key,value in metadata.items():
+            document = {
+                'key': key,
+                "value": value
+            }
+            documents.append(document)
+            num_of_documents += 1
+
+        self.insert_many(documents)
+
+        msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
+        return (msg)
+
+    """
+    read methods:
+    
+    
+    """

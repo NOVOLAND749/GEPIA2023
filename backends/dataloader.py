@@ -5,4 +5,7 @@ import numpy as np
 import pandas as pd
 import pymongo
 
-class
+class DataSet(object):
+    def __init__(self,file_path):
+        self._path = file_path
+        self.data =
