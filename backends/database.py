@@ -74,7 +74,7 @@ class DatabaseAPI(Database):
             alarming = "Collection already exists, to overwrite it please use overwrite = True"
             if verbose:
                 print(alarming)
-            return (alarming)
+            return alarming
         if collection_name in self.db.list_collection_names() and overwrite:
             self.db.drop_collection(collection_name)
 
@@ -94,7 +94,7 @@ class DatabaseAPI(Database):
         self.create_index(["obs_id", pymongo.ASCENDING], unique=True)
 
         msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
-        return (msg)
+        return msg
 
     def write_table_gene_by_var(self,
                                 matrix: np.ndarray,
@@ -106,7 +106,7 @@ class DatabaseAPI(Database):
             alarming = "Collection already exists, to overwrite it please use overwrite = True"
             if verbose:
                 print(alarming)
-            return (alarming)
+            return alarming
         if collection_name in self.db.list_collection_names() and overwrite:
             self.db.drop_collection(collection_name)
 
@@ -126,23 +126,29 @@ class DatabaseAPI(Database):
         self.create_index(["gene_id", pymongo.ASCENDING], unique=True)
 
         msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
-        return (msg)
+        return msg
 
     # default write method is to append the metadata
     def write_metadata(self,
                        metadata: Optional[Dict[str, list]] = None,
+                       metadata_name: str = "metadata",
                        overwrite: bool = False,
                        verbose: bool = True) -> Optional[str]:
-        collection_name = "metadata"
+        collection_name = metadata_name
         if collection_name in self.db.list_collection_names() and overwrite:
             self.db.drop_collection(collection_name)
             self.collection = self.db[collection_name]
+        if collection_name in self.db.list_collection_names() and not overwrite:
+            alarming = "Collection already exists, to overwrite it please use overwrite = True"
+            if verbose:
+                print(alarming)
+            return alarming
         if collection_name not in self.db.list_collection_names():
             self.collection = self.db[collection_name]
 
         documents = []
         num_of_documents = 0
-        for key,value in metadata.items():
+        for key, value in metadata.items():
             document = {
                 'key': key,
                 "value": value
@@ -153,10 +159,77 @@ class DatabaseAPI(Database):
         self.insert_many(documents)
 
         msg = f"{num_of_documents} documents already loaded in collection {collection_name}"
-        return (msg)
+        return msg
 
     """
-    read methods:
+    read methods: read one document at a time
     
+    read_table_obs_by_var : read the obs_by_var table from the database.
+    paras: obs_id : type of int
     
+    read_table_gene_by_var : read the gene_by_var table from the database
+    paras: gene_id : gene name.
+    
+    read_metadata : read the metadata table from the database.
+    paras: key,
+           metadata_name
     """
+
+    def read_table_obs_by_var(self, obs_id: int) -> np.ndarray:
+        collection_name = "obs_by_var_table"
+        self.collection = self.db[collection_name]
+        res = self.find_one({"obs_id": obs_id})
+        return res['obs_value']
+
+    def read_table_gene_by_var(self, gene_id: int) -> np.ndarray:
+        collection_name = "gene_by_var_table"
+        self.collection = self.db[collection_name]
+        res = self.find_one({"gene_id": gene_id})
+        return res["gene_value"]
+
+    def read_metadata(self,
+                      key: str,
+                      metadata_name: str = "metadata",
+                      ) -> list:
+        collection_name = metadata_name
+        self.collection = self.db[collection_name]
+        res = self.find_one({"key":key})
+        return res['value']
+
+
+    """
+    query methods: allow querying many documents at a time.
+    
+    query_table_obs_by_var: query the obs_by_var table from the database.
+    
+    query_table_gene_by_var: query the gene_by_var table from the database.
+    
+    query_metadata: query the metadata table from the database.
+    :param keys: a list of keys to query
+    """
+
+    # accellerate the query process
+    def query_table_obs_by_var(self,
+                               obs_ids : List[int]) -> np.ndarray:
+        collection_name = "obs_by_var_table"
+        self.collection = self.db[collection_name]
+        res = self.find({"obs_id": {"$in": obs_ids}})
+        return np.array([r['obs_value'] for r in res])
+
+    def query_table_gene_by_var(self,
+                                gene_ids : List[str]) -> np.ndarray:
+        collection_name = "gene_by_var_table"
+        self.collection = self.db[collection_name]
+        res = self.find({"gene_id": {"$in": gene_ids}})
+        return np.array([r['gene_value'] for r in res])
+
+    def query_metadata(self,
+                       keys : List[str],
+                       metadata_name: str = "metadata") -> Dict[str, list]:
+        collection_name = metadata_name
+        self.collection = self.db[collection_name]
+        res = self.find({"key": {"$in": keys}})
+        return {r['key']: r['value'] for r in res}
+
+    
+
