@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from backends.models import DataSet
-from backends.serializers import DataSetSerializer
+from backends.models import DataSet,Gene
+from backends.serializers import DataSetSerializer,GeneSerializer
 from django.http import Http404
 from backends.database import DatabaseAPI
 from rest_framework.decorators import api_view
@@ -12,6 +12,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from django.http import FileResponse
+from rest_framework.pagination import PageNumberPagination
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -53,6 +54,31 @@ class TCGADataSetRecord(APIView):
         api = DatabaseAPI(db_name='tcga',collection_name=dataset.collection_name)
         res = api.read_table_obs_by_var(int(pk))
         return Response({"obs_values":res})
+
+
+class GeneList(APIView):
+    ## add ?page=1 to get the first page
+    def get(self,request,format = None):
+        gene_list = Gene.objects.all()
+        paginator = PageNumberPagination()
+        paginated_datasets = paginator.paginate_queryset(gene_list, request)
+        serializer = GeneSerializer(paginated_datasets, many=True)
+        filter_data = [{"gene_name":item['gene_name'],"ENSEMBL":item['ENSEMBL']} for item in serializer.data]
+        return Response(filter_data)
+    #
+
+class GeneDetail(APIView):
+    def get_object(self,gene_name):
+        try:
+            return Gene.objects.filter(gene_name=gene_name)
+        except Gene.DoesNotExist:
+            raise Http404
+
+
+    def get(self,request,gene_name,format = None):
+        gene = self.get_object(gene_name)
+        serializer = GeneSerializer(gene,many=True)
+        return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -107,19 +133,25 @@ def get_gene_info(request,gene_name,format = None):
             raise Http404
         return Response(data)
 
-@api_view(['GET'])
-
-
 
 @api_view(['GET'])
 def general_plot_strip(request,gene_name,format = 'image/png'):
     pl = GenePlot(gene_name)
-    fig = pl.stripplot()
-    buf = io.BytesIO()
-    fig.savefig(buf, format='png')
-    buf.seek(0)
-    return FileResponse(buf, content_type='image/png')
+    if request.method == "GET":
+        fig = pl.stripplot()
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
 
+@api_view(['GET'])
+def get_global_variable(request,variable, format = None):
+    dict = {"PAGE_SIZE": 100}
+    if request.method == "GET":
+        try:
+            return Response(dict[variable])
+        except KeyError:
+            raise Http404
 
 
 
