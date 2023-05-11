@@ -6,7 +6,12 @@ from backends.serializers import DataSetSerializer
 from django.http import Http404
 from backends.database import DatabaseAPI
 from rest_framework.decorators import api_view
-
+from backends.plotting import GenePlot
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io
+from django.http import FileResponse
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -101,6 +106,19 @@ def get_gene_info(request,gene_name,format = None):
             # Handle KeyError
             raise Http404
         return Response(data)
+
+@api_view(['GET'])
+
+
+
+@api_view(['GET'])
+def general_plot_strip(request,gene_name,format = 'image/png'):
+    pl = GenePlot(gene_name)
+    fig = pl.stripplot()
+    buf = io.BytesIO()
+    fig.savefig(buf, format='png')
+    buf.seek(0)
+    return FileResponse(buf, content_type='image/png')
 
 
 

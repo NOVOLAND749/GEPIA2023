@@ -26,6 +26,10 @@ class Database(object):
     def find_many(self, query: Query, projection: Optional[Dict[str, Any]] = None) -> List[Document]:
         return list(self.collection.find(query, projection))
 
+    def find_all(self) -> Dict[str, Any]:
+        res = list(self.collection.find({},{"_id": 0}))
+        return {item['key'] : item['value'] for item in res}
+
     def update_one(self, query: Query, update: Update) -> Any:
         return self.collection.update_one(query, update)
 
@@ -183,7 +187,7 @@ class DatabaseAPI(Database):
         res = self.find_one({"obs_id": obs_id})
         return res['obs_value']
 
-    def read_table_gene_by_var(self, gene_id: int) -> np.ndarray:
+    def read_table_gene_by_var(self, gene_id: str) -> np.ndarray:
         collection_name = "gene_by_var_table"
         self.collection = self.db[collection_name]
         res = self.find_one({"gene_id": gene_id})
@@ -232,6 +236,11 @@ class DatabaseAPI(Database):
         self.collection = self.db[collection_name]
         res = self.find_many({"key": {"$in": keys}})
         return {r['key']: r['value'] for r in res}
+
+    def get_metadata(self,metadata_name: str = "metadata") -> dict:
+        collection_name = metadata_name
+        self.collection = self.db[collection_name]
+        return self.find_all()
 
     def delete_table_obs_by_var(self, keys : List[int]):
         collection_name = "obs_by_var_table"
