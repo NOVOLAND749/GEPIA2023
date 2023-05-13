@@ -11,5 +11,6 @@ urlpatterns = format_suffix_patterns([
     url(r'^gene_info/$',views.GeneList.as_view(),name='gene-list'),
     url(r'^gene_info/(?P<gene_name>[^/]+)/$',views.GeneDetail.as_view(),name='gene-info'),
     url(r'^gene_plot/strip/(?P<gene_name>[^/]+)/$',views.general_plot_strip,name='gene-plot-strip'),
+    url(r'^gene_plot/bar/(?P<gene_name>[^/]+)/$',views.general_plot_bar,name='gene-plot-bar'),
     url(r'^global_variable/(?P<variable>[^/]+)/$',views.get_global_variable,name='global-variable'),
 ])

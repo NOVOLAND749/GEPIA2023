@@ -15,7 +15,6 @@ class GenePlot(object):
         fig, ax = plt.subplots(figsize=(10, 8))
         arr = np.array(self.api.read_table_gene_by_var(self.gene_name))
         arr = 2**arr - 1
-        print(np.min(arr))
         self.collection_name = "sample_info"
         df = pd.DataFrame(self.api.get_metadata(self.collection_name))
         df[self.gene_name] = arr
@@ -37,4 +36,20 @@ class GenePlot(object):
         ax.set_ylim(-offset_y, y_max + offset_y)
         plt.tight_layout()
         return fig
+
+    def bar_plot(self) -> plt.figure:
+        fig,ax = plt.subplots(figsize=(10,8))
+        arr = np.array(self.api.read_table_gene_by_var(self.gene_name))
+        arr = 2 ** arr - 1
+        self.collection_name = "sample_info"
+        df = pd.DataFrame(self.api.get_metadata(self.collection_name))
+        df[self.gene_name] = arr
+        mean_df = df.groupby(["Disease", "Type"]).mean()
+        unstack_df = mean_df.unstack (level=1).fillna(0.0)
+        unstack_df.columns = unstack_df.columns.droplevel(0)
+        unstack_df.plot.bar(ax = ax)
+        plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+        plt.tight_layout()
+        return fig
+
 

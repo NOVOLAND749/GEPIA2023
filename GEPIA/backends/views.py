@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import io
 from django.http import FileResponse
 from rest_framework.pagination import PageNumberPagination
+from django.core.exceptions import MultipleObjectsReturned
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -69,15 +70,23 @@ class GeneList(APIView):
 
 class GeneDetail(APIView):
     def get_object(self,gene_name):
+        status = 0
         try:
-            return Gene.objects.filter(gene_name=gene_name)
+            return Gene.objects.get(gene_name=gene_name),status
         except Gene.DoesNotExist:
             raise Http404
+        except MultipleObjectsReturned:
+            status = 1
+            print("Multiple objects returned for gene_name: %s" % gene_name)
+            return Gene.objects.filter(gene_name=gene_name),status
 
 
     def get(self,request,gene_name,format = None):
-        gene = self.get_object(gene_name)
-        serializer = GeneSerializer(gene,many=True)
+        gene,status = self.get_object(gene_name)
+        if status:
+            serializer = GeneSerializer(gene,many=True)
+        else:
+            serializer = GeneSerializer(gene)
         return Response(serializer.data)
 
 
@@ -139,6 +148,16 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
     pl = GenePlot(gene_name)
     if request.method == "GET":
         fig = pl.stripplot()
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
+
+@api_view(['GET'])
+def general_plot_bar(request,gene_name,format = 'image/png'):
+    pl = GenePlot(gene_name)
+    if request.method == "GET":
+        fig = pl.bar_plot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
         buf.seek(0)
