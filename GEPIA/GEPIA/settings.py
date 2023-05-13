@@ -27,8 +27,13 @@ SECRET_KEY = 'django-insecure-)pirgp##$a(v&n%06^9@e*o9)q^krlr!44p57i@ou*^4(6ru!h
 DEBUG = True
 
 ALLOWED_HOSTS = [
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
     h for h in os.getenv('ALLOWED_HOSTS', '').split(",") if h
 ]
+=======
+        h for h in os.getenv('ALLOWED_HOSTS', '').split(",") if h
+        ]
 
 
 # Application definition
