@@ -28,7 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     h for h in os.getenv('ALLOWED_HOSTS', '').split(",") if h
-]
+]+['localhost']
 
 
 # Application definition
