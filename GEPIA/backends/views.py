@@ -126,8 +126,9 @@ def disease_abbr_list(request,format = None):
                     "Uterine Carcinosarcoma": "UCS",
                     "Uveal Melanoma": "UVM"
                     }
+    abbr_list = [{"full": key, "abbr": value} for key, value in disease_abbr.items()]
     if request.method == "GET":
-        return Response(disease_abbr)
+        return Response(abbr_list)
 
 @api_view(['GET'])
 def get_gene_info(request,gene_name,format = None):
