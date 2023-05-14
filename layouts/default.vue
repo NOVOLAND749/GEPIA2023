@@ -27,12 +27,12 @@
       </Navbar>
     </header>
 
-    <div>
+    <div class="mb-20">
       <slot></slot>
     </div>
 
     <footer
-      class="fixed bottom-0 z-20 w-full bg-transparent backdrop-blur-md shadow-3xl"
+      class="fixed bottom-0 z-20 border-t-2 w-full bg-transparent backdrop-blur-md shadow-3xl"
     >
       <div class="w-full mx-auto p-6 text-center">
         &copy; 2023 XXXX. All rights reserved.
