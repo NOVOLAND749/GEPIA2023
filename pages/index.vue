@@ -14,7 +14,10 @@
               @input="updateSearchResults"
             >
               <template #prefix>
-                <Icon name="🔎"></Icon>
+                <Icon
+                  name="material-symbols:search"
+                  class="transform -scale-x-100"
+                ></Icon>
               </template>
             </Input>
             <div
@@ -30,8 +33,8 @@
                 </ListGroupItem>
               </ListGroup>
             </div>
-            <div v-if="geneDetail">
-              {{ geneDetail }}
+            <div v-if="geneDetail" class="pt-2 px-2">
+              <GeneDetail :gene="geneDetail"></GeneDetail>
             </div>
             <div v-else-if="isExactMatch" class="w-full mx-auto pt-3">
               <Spinner size="12" color="white" />
