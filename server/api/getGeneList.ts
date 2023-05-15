@@ -1,6 +1,4 @@
-import GeneInfoType from "~/types/GeneInfoType";
-
 export default defineEventHandler(async () => {
   const { apiBase } = useRuntimeConfig();
-  return await $fetch<GeneInfoType[]>(apiBase + "/gene_info");
+  return await $fetch<string[]>(apiBase + "/gene_info");
 });
