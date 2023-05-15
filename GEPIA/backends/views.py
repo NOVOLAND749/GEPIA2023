@@ -64,7 +64,8 @@ class GeneList(APIView):
         # paginator = PageNumberPagination()
         # paginated_datasets = paginator.paginate_queryset(gene_list, request)
         serializer = GeneSerializer(gene_list, many=True)
-        filter_data = [{"gene_name":item['gene_name'],"ENSEMBL":item['ENSEMBL']} for item in serializer.data]
+        # filter_data = [{"gene_name":item['gene_name'],"ENSEMBL":item['ENSEMBL']} for item in serializer.data]
+        filter_data = [item['gene_name'] for item in serializer.data]
         return Response(filter_data)
     #
 
