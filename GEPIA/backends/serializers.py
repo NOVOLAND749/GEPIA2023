@@ -4,7 +4,7 @@ from backends.models import DataSet,Gene
 class DataSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = DataSet
-        fields = ('id','client_name','port','db_name','collection_name','descriptions')
+        fields = ('id','db_name','tumor_sample_number','normal_sample_number','has_normal','descriptions')
 
 
 class GeneSerializer(serializers.ModelSerializer):

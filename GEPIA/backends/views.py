@@ -18,7 +18,7 @@ from django.core.exceptions import MultipleObjectsReturned
 # Create your views here.
 class TCGADataSetList(APIView):
     def get(self,request,format=None):
-        datasets = DataSet.objects.filter(db_name='tcga')
+        datasets = DataSet.objects.all()
         serializer = DataSetSerializer(datasets,many=True)
         return Response(serializer.data)
 
@@ -31,27 +31,27 @@ class TCGADataSetList(APIView):
     #     return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class TCGADataSetDetail(APIView):
-    def get_object(self,collection_name):
+    def get_object(self,db_name):
         try:
-            return DataSet.objects.get(db_name='tcga',collection_name=collection_name)
+            return DataSet.objects.get(db_name=db_name)
         except DataSet.DoesNotExist:
             raise Http404
 
-    def get(self,request,collection_name,format=None):
-        dataset = self.get_object(collection_name)
+    def get(self,request,db_name,format=None):
+        dataset = self.get_object(db_name)
         serializer = DataSetSerializer(dataset)
         return Response(serializer.data)
 
 class TCGADataSetRecord(APIView):
-    def get_object(self,collection_name):
+    def get_object(self,db_name):
         try:
-            return DataSet.objects.get(db_name='tcga',collection_name=collection_name)
+            return DataSet.objects.get(db_name=db_name)
         except DataSet.DoesNotExist:
             raise Http404
 
 
-    def get(self,request,collection_name,pk,format=None):
-        dataset = self.get_object(collection_name)
+    def get(self,request,db_name,pk,format=None):
+        dataset = self.get_object(db_name)
         api = DatabaseAPI(db_name='tcga',collection_name=dataset.collection_name)
         res = api.read_table_obs_by_var(int(pk))
         return Response({"obs_values":res})
@@ -61,9 +61,9 @@ class GeneList(APIView):
     ## add ?page=1 to get the first page
     def get(self,request,format = None):
         gene_list = Gene.objects.all()
-        paginator = PageNumberPagination()
-        paginated_datasets = paginator.paginate_queryset(gene_list, request)
-        serializer = GeneSerializer(paginated_datasets, many=True)
+        # paginator = PageNumberPagination()
+        # paginated_datasets = paginator.paginate_queryset(gene_list, request)
+        serializer = GeneSerializer(gene_list, many=True)
         filter_data = [{"gene_name":item['gene_name'],"ENSEMBL":item['ENSEMBL']} for item in serializer.data]
         return Response(filter_data)
     #
@@ -142,6 +142,16 @@ def get_gene_info(request,gene_name,format = None):
             # Handle KeyError
             raise Http404
         return Response(data)
+
+@api_view(['GET'])
+def get_similar_gene_info(request,gene_name,format = None):
+    api = DatabaseAPI(db_name='tcga',collection_name='gene_info')
+    genes = api.read_metadata(gene_name,metadata_name="most 100 similar genes")
+    values = api.read_metadata(gene_name,metadata_name="most 100 similar gene values")
+    if request.method == "GET":
+        my_list = [{"gene_name":gene,"value":value} for gene,value in zip(genes,values)]
+        return Response(my_list)
+
 
 
 @api_view(['GET'])
