@@ -27,6 +27,8 @@
       </Navbar>
     </header>
 
+    <Sidebar />
+
     <div class="mb-20">
       <slot></slot>
     </div>
