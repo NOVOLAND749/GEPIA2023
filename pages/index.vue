@@ -62,7 +62,8 @@ import Fuse from "fuse.js";
 import GeneDetailType from "~/types/GeneDetailType";
 
 const activeTab = ref("first");
-const { data: genes } = await useLazyFetch("/api/getGeneList");
+const geneStore = useGeneStore();
+const genes = ref(geneStore.geneList);
 
 const geneSearch = new Fuse(genes.value || [], { threshold: 0.3 });
 const geneSearchTerm = ref("");
@@ -101,6 +102,16 @@ watch(isExactMatch, async (isExactMatch) => {
       );
       geneDetail.value = result.value;
     }
+  }
+});
+
+onBeforeMount(async () => {
+  if (!genes.value.length) {
+    if (!geneStore.geneList.length) {
+      await geneStore.loadFromLocalStorage();
+    }
+    genes.value = geneStore.geneList;
+    geneSearch.setCollection(genes.value);
   }
 });
 </script>
