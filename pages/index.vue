@@ -97,7 +97,6 @@ watch(isExactMatch, async (isExactMatch) => {
         `/api/getGeneDetail/${geneSearchTerm.value}`
       );
       geneDetail.value = result.value;
-      console.log(result.value);
     }
   }
 });
