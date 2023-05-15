@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { TheCard, ListGroup, ListGroupItem } from "flowbite-vue";
 const { data: abbrs, pending: abbrsPending } = await useFetch(
-  "/api/diseaseAbbr"
+  "/api/getDiseaseAbbr"
 );
 const showSidebar = ref(false);
 </script>
