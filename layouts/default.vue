@@ -32,7 +32,7 @@
     </div>
 
     <footer
-      class="fixed bottom-0 z-20 border-t-2 w-full bg-transparent backdrop-blur-md shadow-3xl"
+      class="fixed bottom-0 z-20 border-t-[1px] w-full bg-transparent backdrop-blur-sm shadow-3xl"
     >
       <div class="w-full mx-auto p-6 text-center">
         &copy; 2023 XXXX. All rights reserved.
