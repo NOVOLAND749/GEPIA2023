@@ -14,6 +14,7 @@ import io
 from django.http import FileResponse
 from rest_framework.pagination import PageNumberPagination
 from django.core.exceptions import MultipleObjectsReturned
+import numpy as np
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -79,15 +80,15 @@ class GeneDetail(APIView):
         except MultipleObjectsReturned:
             status = 1
             print("Multiple objects returned for gene_name: %s" % gene_name)
-            return Gene.objects.filter(gene_name=gene_name),status
+            return Gene.objects.filter(gene_name=gene_name).first(),status
 
 
     def get(self,request,gene_name,format = None):
         gene,status = self.get_object(gene_name)
-        if status:
-            serializer = GeneSerializer(gene,many=True)
-        else:
-            serializer = GeneSerializer(gene)
+        # if status:
+        #    serializer = GeneSerializer(gene,many=True)
+        # else:
+        serializer = GeneSerializer(gene)
         return Response(serializer.data)
 
 
@@ -153,7 +154,14 @@ def get_similar_gene_info(request,gene_name,format = None):
         my_list = [{"gene_name":gene,"value":value} for gene,value in zip(genes,values)]
         return Response(my_list)
 
-
+@api_view(['GET'])
+def diffrential_expression_by_ANOVA(request,dataset,Log2FC=1.0,p_adj=0.01):
+    api = DatabaseAPI(db_name = "differential_genes",collection_name = "test")
+    res = api.get_metadata(metadata_name=f'TCGA-{dataset}-differential-genes')
+    if request.method == "GET":
+        my_list = [{"gene_name":gene,**value}for gene,value in res.items() \
+                   if np.abs(value['log2fc'])>=float(Log2FC) and value['p']<=float(p_adj)]
+        return Response(my_list)
 
 @api_view(['GET'])
 def general_plot_strip(request,gene_name,format = 'image/png'):

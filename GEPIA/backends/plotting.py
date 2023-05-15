@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 import pymongo
 from backends.database import DatabaseAPI
+import seaborn as sns
+from statannot import add_stat_annotation
 
 
 class GenePlot(object):
@@ -52,4 +54,13 @@ class GenePlot(object):
         plt.tight_layout()
         return fig
 
+def boxplot(df,x,y,hue,box_pairs=None):
+    fig, ax = plt.subplots(figsize=(10, 8))
+    palette = sns.color_palette("hls", 8)
+    box_pairs = box_pairs
+    p = sns.boxplot(x=x, y=y, data=df, hue=hue, palette=palette, ax=ax)
+    p.legend(loc='center left', bbox_to_anchor=(1, 0.5), ncol=1)
+    if box_pairs:
+        add_stat_annotation(data=df, x=x, y=y, hue=hue, box_pairs=box_pairs, test='Mann-Whitney', text_format='star', loc='outside', verbose=2, ax=ax)
+    sns.despine(offset=10, trim=True)
 
