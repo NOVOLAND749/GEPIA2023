@@ -10,9 +10,9 @@ export const useGeneStore = defineStore("GeneStore", () => {
     if (data) {
       geneList.value = JSON.parse(data);
     } else {
-      const { data: result } = await useLazyFetch("/api/getGeneList");
-      if (result.value) {
-        geneList.value = result.value;
+      const result = await $fetch("/api/getGeneList");
+      if (result) {
+        geneList.value = result;
         saveToLocalStorage();
       }
     }
