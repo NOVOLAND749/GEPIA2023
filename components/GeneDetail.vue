@@ -5,7 +5,7 @@
         {{ gene.gene_name }}
       </h3>
       <p class="py-1">{{ gene.description }}</p>
-      <div v-if="gene.Synonyms" class="cardEntry">
+      <div v-if="gene.Synonyms && gene.Synonyms != '-'" class="cardEntry">
         <h4>Synonyms</h4>
         <div class="flex flex-row flex-wrap gap-y-2.5 w-full py-2">
           <Badge v-for="syn in gene.Synonyms.split('|')">{{ syn }}</Badge>
