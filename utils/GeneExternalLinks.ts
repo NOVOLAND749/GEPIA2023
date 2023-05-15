@@ -36,7 +36,7 @@ const getDrugBankLink = (gene: GeneDetailType) => {
   return `//www.drugbank.ca/unearth/q?searcher=bio_entities&query=${gene.gene_name}`;
 };
 
-export default function getGeneExternalLinks(gene: GeneDetailType) {
+export function getGeneExternalLinks(gene: GeneDetailType) {
   return [
     { name: "GeneCard", link: getGeneCardLink(gene) },
     { name: "NCBI", link: getNCBILink(gene) },
