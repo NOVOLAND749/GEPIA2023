@@ -30,7 +30,12 @@
                 </ListGroupItem>
               </ListGroup>
             </div>
-            <div v-if="isExactMatch">This will be the detail of a gene</div>
+            <div v-if="geneDetail">
+              {{ geneDetail }}
+            </div>
+            <div v-else-if="isExactMatch" class="w-full mx-auto pt-3">
+              <Spinner size="12" color="white" />
+            </div>
           </div>
         </Tab>
       </Tabs>
@@ -40,7 +45,7 @@
 
 <script setup lang="ts">
 import {
-  Dropdown,
+  Spinner,
   ListGroup,
   ListGroupItem,
   Tab,
@@ -51,7 +56,6 @@ import Fuse from "fuse.js";
 import GeneDetailType from "~/types/GeneDetailType";
 
 const activeTab = ref("first");
-const totalPageNum = await useLazyFetch("/api/getPageSize");
 const { data: genes } = await useLazyFetch("/api/getGeneList");
 
 const geneSearch = new Fuse(genes.value || [], { threshold: 0.3 });
@@ -79,4 +83,19 @@ const updateSearchResults = () => {
     }
   }, 500);
 };
+
+const geneDetail = ref(null as GeneDetailType | null);
+
+watch(isExactMatch, async (isExactMatch) => {
+  if (isExactMatch) {
+    geneDetail.value = null;
+    if (geneSearchTerm) {
+      const { data: result } = await useLazyFetch(
+        `/api/getGeneDetail/${geneSearchTerm.value}`
+      );
+      geneDetail.value = result.value;
+      console.log(result.value);
+    }
+  }
+});
 </script>
