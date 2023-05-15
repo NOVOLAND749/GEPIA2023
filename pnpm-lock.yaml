@@ -16,6 +16,9 @@ devDependencies:
   flowbite-vue:
     specifier: ^0.0.10
     version: 0.0.10(tailwindcss@3.3.2)(vue@3.3.2)
+  fuse.js:
+    specifier: ^6.6.2
+    version: 6.6.2
   nuxt:
     specifier: ^3.4.3
     version: 3.4.3(@types/node@20.1.3)
@@ -2744,6 +2747,11 @@ packages:
 
   /function-bind@1.1.1:
     resolution: {integrity: sha512-yIovAzMX49sF8Yl58fSCWJ5svSLuaibPxXQJFLmBObTuCr0Mf1KiPopGM9NiFjiYBCbfaa2Fh6breQ6ANVTI0A==}
+    dev: true
+
+  /fuse.js@6.6.2:
+    resolution: {integrity: sha512-cJaJkxCCxC8qIIcPBF9yGxY0W/tVZS3uEISDxhYIdtk8OL93pe+6Zj7LjCqVV4dzbqcriOZ+kQ/NE4RXZHsIGA==}
+    engines: {node: '>=10'}
     dev: true
 
   /gauge@3.0.2:
