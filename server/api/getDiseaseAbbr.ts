@@ -1,4 +1,4 @@
-import { DiseaseAbbrType } from "../../types/DiseaseAbbrType";
+import DiseaseAbbrType from "~/types/DiseaseAbbrType";
 
 export default defineEventHandler(async () => {
   const { apiBase } = useRuntimeConfig();

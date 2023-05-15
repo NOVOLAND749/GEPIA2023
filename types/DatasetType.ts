@@ -1,4 +1,4 @@
-export interface DatasetType {
+export default interface DatasetType {
   id: number;
   client_name: string;
   port: number;

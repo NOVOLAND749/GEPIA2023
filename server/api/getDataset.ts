@@ -1,4 +1,4 @@
-import { DatasetType } from "~/types/DatasetType";
+import DatasetType from "~/types/DatasetType";
 
 export default defineEventHandler(async () => {
   const { apiBase } = useRuntimeConfig();
