@@ -14,9 +14,14 @@
       <div v-else>
         <Accordion flush>
           <AccordionPanel>
-            <AccordionHeader class="bg-gray-100"
-              >Disease Abbreviations</AccordionHeader
-            >
+            <AccordionHeader class="bg-gray-100">
+              <Icon
+                name="material-symbols:match-word"
+                size="24"
+                class="pb-1"
+              />
+              Disease Abbreviations
+            </AccordionHeader>
             <AccordionContent v-for="ab in abbrs" class="bg-gray-50">
               <div class="flex flex-row">
                 <div class="w-10 mr-4 text-right font-bold my-auto">
@@ -34,7 +39,7 @@
     <div @click="showSidebar = !showSidebar" class="cursor-pointer">
       <Icon
         name="material-symbols:chevron-right-rounded"
-        size="2rem"
+        size="32"
         class="ease-out duration-100"
         :class="{ 'rotate-180': showSidebar }"
       ></Icon>

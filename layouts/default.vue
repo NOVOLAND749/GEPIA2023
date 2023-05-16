@@ -14,13 +14,20 @@
         <template #default="{ isShowMenu }">
           <NavbarCollapse :isShowMenu="isShowMenu">
             <NuxtLink to="/">
-              <NavbarLink>Home</NavbarLink>
+              <NavbarLink>
+                <Icon name="material-symbols:house" class="mb-0.5" /> Home
+              </NavbarLink>
             </NuxtLink>
             <NuxtLink to="/about">
-              <NavbarLink>About</NavbarLink>
+              <NavbarLink>
+                <Icon name="material-symbols:info" class="mb-0.5" /> About
+              </NavbarLink>
             </NuxtLink>
             <NuxtLink to="/contact">
-              <NavbarLink>Contact</NavbarLink>
+              <NavbarLink>
+                <Icon name="material-symbols:contact-support" class="mb-0.5" />
+                Contact
+              </NavbarLink>
             </NuxtLink>
           </NavbarCollapse>
         </template>
