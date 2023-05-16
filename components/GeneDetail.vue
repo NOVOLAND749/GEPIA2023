@@ -48,25 +48,23 @@
       </div>
     </TheCard>
 
-    <div class="mt-4 py-6 px-2 rounded-2xl bg-white shadow-md border">
-      <h3 class="text-lg font-bold text-center">
-        Expression profile of {{ gene.gene_name }} across all tumor samples and
-        paired normal tissues
-      </h3>
-      <h4 class="text-center">
-        Each dot represents an expression of certain sample
-      </h4>
-      <div class="w-full h-fit flex flex-row items-center">
-        <div class="w-10 h-72 flex justify-center items-center">
-          <p
-            class="transform -rotate-90 whitespace-nowrap text-lg tracking-wide"
-          >
-            <b>T</b>ranscripts <b>P</b>er <B>M</B>illion (<b>TPM</b>)
-          </p>
-        </div>
-        <img class="flex-auto w-full" :src="genePlotLinks.StripPlot" />
-      </div>
-    </div>
+    <PlotCard
+      :title="`Expression profile of ${gene.gene_name} across all tumor samples and
+    paired normal tissues`"
+      description="Each dot represents an expression of certain sample"
+      :imageUrl="genePlotLinks.StripPlot"
+      yLabel="<b>T</b>ranscripts <b>P</b>er <B>M</B>illion (<b>TPM</b>)"
+      class="mt-4"
+    />
+
+    <PlotCard
+      :title="`Expression profile of ${gene.gene_name} across all tumor samples and
+    paired normal tissues`"
+      description="Bar height represents the median expression of certain sample"
+      :imageUrl="genePlotLinks.BarPlot"
+      yLabel="<b>T</b>ranscripts <b>P</b>er <B>M</B>illion (<b>TPM</b>)"
+      class="mt-4"
+    />
   </div>
 </template>
 
