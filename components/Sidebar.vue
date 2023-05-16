@@ -12,17 +12,13 @@
         </Alert>
       </div>
       <div v-else>
-        <Accordion flush>
-          <AccordionPanel>
-            <AccordionHeader class="bg-gray-100">
-              <Icon
-                name="material-symbols:match-word"
-                size="24"
-                class="pb-1"
-              />
+        <Accordion flush always-open>
+          <AccordionPanel class="rounded-lg overflow-hidden border shadow-lg">
+            <AccordionHeader class="bg-gray-50">
+              <Icon name="material-symbols:match-word" size="24" class="pb-1" />
               Disease Abbreviations
             </AccordionHeader>
-            <AccordionContent v-for="ab in abbrs" class="bg-gray-50">
+            <AccordionContent v-for="ab in abbrs" class="bg-white border-x">
               <div class="flex flex-row">
                 <div class="w-10 mr-4 text-right font-bold my-auto">
                   {{ ab.abbr }}
