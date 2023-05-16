@@ -11,6 +11,7 @@
           { key: 'gene_name', name: 'Gene Name' },
           { key: 'value', name: 'Score' },
         ]"
+        :geneNameIndex="0"
         :pageSize="10"
         class="col-span-5"
       />

@@ -22,10 +22,38 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
             >
-              {{ entry[tableCols[0].key] }}
+              <a
+                :href="
+                  geneNameIndex == 0 ? `/?gene=${entry[tableCols[0].key]}` : '#'
+                "
+                :class="{
+                  'cursor-default pointer-events-none': !(geneNameIndex == 0),
+                  'text-primary': geneNameIndex == 0,
+                }"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ entry[tableCols[0].key] }}
+              </a>
             </th>
-            <td class="px-6 py-4" v-for="col in tableCols.slice(1)">
-              {{ entry[col.key] }}
+            <td
+              class="px-6 py-4"
+              v-for="[i, col] in tableCols.slice(1).entries()"
+            >
+              <a
+                :href="geneNameIndex == i + 1 ? `/?gene=${entry[col.key]}` : '#'"
+                :class="{
+                  'cursor-default pointer-events-none': !(
+                    geneNameIndex ==
+                    i + 1
+                  ),
+                  'text-primary': geneNameIndex == i + 1,
+                }"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ entry[col.key] }}
+              </a>
             </td>
           </tr>
         </tbody>
@@ -100,6 +128,11 @@ const props = defineProps({
     type: Object as PropType<{ [key: string]: string | number }[]>,
     required: true,
   },
+  geneNameIndex: {
+    type: Number,
+    required: false,
+    default: -1,
+  },
   tableCols: {
     type: Object as PropType<{ key: string; name: string }[]>,
     required: true,
@@ -111,10 +144,12 @@ const props = defineProps({
   },
 });
 
-const { title, description, tableData, tableCols, pageSize } = props;
+const { title, description, tableData, tableCols, pageSize, geneNameIndex } =
+  props;
 
 const totalPages = pageSize == 0 ? 1 : Math.ceil(tableData.length / pageSize);
 const currentPageNum = ref(1);
+
 const slicedTableData = computed(() => {
   if (pageSize > 0) {
     return tableData.slice(
