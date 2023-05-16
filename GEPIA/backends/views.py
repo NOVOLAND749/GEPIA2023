@@ -171,7 +171,7 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         fig = pl.stripplot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        fig.close()
+        plt.close(fig)
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
@@ -182,7 +182,7 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         fig = pl.bar_plot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        fig.close()
+        plt.close(fig)
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
@@ -211,7 +211,7 @@ def box_plot(request,gene_name,input_str,format = 'image/png'):
         fig = boxplot(df=df,x='disease',y='count',hue='type',box_pairs=box_pairs)
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        fig.close()
+        plt.close(fig)
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
