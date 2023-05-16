@@ -57,7 +57,7 @@
         Each dot represents an expression of certain sample
       </h4>
       <div class="w-full h-fit flex flex-row items-center">
-        <div class="w-10 flex justify-center">
+        <div class="w-10 h-72 flex justify-center items-center">
           <p
             class="transform -rotate-90 whitespace-nowrap text-lg tracking-wide"
           >
