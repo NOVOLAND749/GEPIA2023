@@ -61,20 +61,26 @@ import {
 import Fuse from "fuse.js";
 import GeneDetailType from "~/types/GeneDetailType";
 
+const route = useRoute();
+const router = useRouter();
+
 const activeTab = ref("first");
 const geneStore = useGeneStore();
 const genes = ref(geneStore.geneList);
 
 const geneSearch = new Fuse(genes.value || [], { threshold: 0.3 });
-const geneSearchTerm = ref("");
+const geneSearchTerm = ref(
+  route.query.gene ? (route.query.gene as string) : ""
+);
 const geneSearchResults = ref([] as string[]);
-const isExactMatch = ref(false);
+const isExactMatch = ref(route.query.gene ? true : false);
 const searchTimeout = ref(0 as number | ReturnType<typeof setTimeout>);
 
 const selectSuggestion = (gene: string) => {
   geneSearchTerm.value = gene;
   geneSearchResults.value = [];
   isExactMatch.value = true;
+  router.push({ query: { gene: gene } });
 };
 const updateSearchResults = () => {
   clearTimeout(searchTimeout.value);
@@ -96,11 +102,10 @@ const geneDetail = ref(null as GeneDetailType | null);
 watch(isExactMatch, async (isExactMatch) => {
   if (isExactMatch) {
     geneDetail.value = null;
-    if (geneSearchTerm) {
-      const { data: result } = await useLazyFetch(
+    if (geneSearchTerm.value) {
+      geneDetail.value = await $fetch(
         `/api/getGeneDetail/${geneSearchTerm.value}`
       );
-      geneDetail.value = result.value;
     }
   }
 });
@@ -112,6 +117,15 @@ onBeforeMount(async () => {
     }
     genes.value = geneStore.geneList;
     geneSearch.setCollection(genes.value);
+  }
+
+  if (isExactMatch.value) {
+    geneDetail.value = null;
+    if (geneSearchTerm.value) {
+      geneDetail.value = await $fetch(
+        `/api/getGeneDetail/${geneSearchTerm.value}`
+      );
+    }
   }
 });
 </script>
