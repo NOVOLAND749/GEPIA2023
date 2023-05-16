@@ -1,7 +1,7 @@
 <template>
   <div class="w-full">
     <div class="grid grid-cols-9 gap-4">
-      <DetailCard :gene="gene" class="col-span-4 h-fit" />
+      <DetailCard :gene="gene" class="col-span-9 md:col-span-4 h-fit" />
 
       <TableCard
         :title="`Genes similar to ${gene.gene_name}`"
@@ -13,7 +13,7 @@
         ]"
         :geneNameIndex="0"
         :pageSize="10"
-        class="col-span-5"
+        class="col-span-9 md:col-span-5"
       />
     </div>
 

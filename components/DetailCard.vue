@@ -12,7 +12,7 @@
     </div>
     <div class="cardEntry">
       <h4>Chromosome location</h4>
-      <div class="grid grid-cols-2 gap-3 pt-3 w-3/4">
+      <div class="grid grid-cols-2 gap-3 pt-3 px-2 w-fit">
         <b class="text-right">Chromosome</b>
         <p>{{ gene.chromosome.substring(3) }}</p>
         <b class="text-right">Start</b>
