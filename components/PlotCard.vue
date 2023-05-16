@@ -1,5 +1,5 @@
 <template>
-  <div class="py-6 px-2 rounded-2xl bg-white shadow-md border">
+  <div class="py-6 px-2 rounded-lg bg-white shadow-md border">
     <h3 class="text-lg font-bold text-center" v-html="title"></h3>
     <h4 class="text-center" v-if="description" v-html="description"></h4>
     <div class="w-full h-fit flex flex-row items-center">
