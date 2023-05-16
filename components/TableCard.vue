@@ -1,0 +1,128 @@
+<template>
+  <div class="py-6 px-2 rounded-lg bg-white shadow-md border">
+    <h3 class="text-lg font-bold text-center" v-html="title"></h3>
+    <h4 class="text-center" v-if="description" v-html="description"></h4>
+
+    <div class="relative overflow-x-auto rounded-lg border mt-8">
+      <table class="w-full text-sm text-center text-gray-500">
+        <thead class="text-sm text-gray-700 uppercase bg-gray-50 border-b">
+          <tr class="border-b">
+            <th scope="col" class="px-6 py-3" v-for="col in tableCols">
+              {{ col.name }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            class="border-b"
+            v-for="[idx, entry] in slicedTableData.entries()"
+            :class="{ 'bg-gray-50': idx % 2 }"
+          >
+            <th
+              scope="row"
+              class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
+            >
+              {{ entry[tableCols[0].key] }}
+            </th>
+            <td class="px-6 py-4" v-for="col in tableCols.slice(1)">
+              {{ entry[col.key] }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="text-center pt-2">
+      <ButtonGroup>
+        <Button
+          color="alternative"
+          class="shadow-none border-none"
+          square
+          @click="currentPageNum = 1"
+          :disabled="currentPageNum == 1"
+        >
+          <Icon name="material-symbols:first-page" size="24" />
+        </Button>
+        <Button
+          color="alternative"
+          class="shadow-none border-none"
+          square
+          @click="currentPageNum--"
+          :disabled="currentPageNum == 1"
+        >
+          <Icon name="material-symbols:chevron-left" size="24" />
+        </Button>
+        <Button
+          color="alternative"
+          class="shadow-none border-none"
+          square
+          disabled
+        >
+          {{ currentPageNum }} / {{ totalPages }}
+        </Button>
+        <Button
+          color="alternative"
+          class="shadow-none border-none"
+          square
+          @click="currentPageNum++"
+          :disabled="currentPageNum == totalPages"
+        >
+          <Icon name="material-symbols:chevron-right" size="24" />
+        </Button>
+        <Button
+          color="alternative"
+          class="shadow-none border-none"
+          square
+          @click="currentPageNum = totalPages"
+          :disabled="currentPageNum == totalPages"
+        >
+          <Icon name="material-symbols:last-page" size="24" />
+        </Button>
+      </ButtonGroup>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ButtonGroup, Button, Table } from "flowbite-vue";
+
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
+  description: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  tableData: {
+    type: Object as PropType<{ [key: string]: string | number }[]>,
+    required: true,
+  },
+  tableCols: {
+    type: Object as PropType<{ key: string; name: string }[]>,
+    required: true,
+  },
+  pageSize: {
+    type: Number,
+    required: false,
+    default: 0,
+  },
+});
+
+const { title, description, tableData, tableCols, pageSize } = props;
+
+const totalPages = pageSize == 0 ? 1 : Math.ceil(tableData.length / pageSize);
+const currentPageNum = ref(1);
+const slicedTableData = computed(() => {
+  if (pageSize > 0) {
+    return tableData.slice(
+      (currentPageNum.value - 1) * pageSize,
+      currentPageNum.value * pageSize
+    );
+  } else {
+    return tableData;
+  }
+});
+</script>
