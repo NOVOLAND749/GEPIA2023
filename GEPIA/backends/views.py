@@ -6,15 +6,16 @@ from backends.serializers import DataSetSerializer,GeneSerializer
 from django.http import Http404
 from backends.database import DatabaseAPI
 from rest_framework.decorators import api_view
-from backends.plotting import GenePlot
+from backends.plotting import GenePlot,boxplot
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from django.http import FileResponse
-from rest_framework.pagination import PageNumberPagination
+# from rest_framework.pagination import PageNumberPagination
 from django.core.exceptions import MultipleObjectsReturned
 import numpy as np
+import pandas as pd
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -170,6 +171,7 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         fig = pl.stripplot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
+        fig.close()
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
@@ -180,8 +182,41 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         fig = pl.bar_plot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
+        fig.close()
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
+
+@api_view(['GET'])
+def box_plot(request,gene_name,input_str,format = 'image/png'):
+    datasets = input_str.split('&')
+    if len(datasets) > 5:
+        msg = "Too many datasets, please select less than 5 datasets"
+        return Response(msg)
+    else:
+        api = DatabaseAPI(db_name='dataset',collection_name='test')
+        count = []
+        type = []
+        disease = []
+        box_pairs = []
+        for dataset in datasets:
+            t_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-tumor')
+            n_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-normal')
+            count += t_val
+            count += n_val
+            type += ['tumor']*len(t_val)
+            type += ['normal']*len(n_val)
+            disease += [dataset]*(len(t_val)+len(n_val))
+            box_pairs.append(((dataset,'tumor'),(dataset,'normal')))
+        df = pd.DataFrame({'count':count,'type':type,'disease':disease})
+        fig = boxplot(df=df,x='disease',y='count',hue='type',box_pairs=box_pairs)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        fig.close()
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
+
+
+
 
 @api_view(['GET'])
 def get_global_variable(request,variable, format = None):
