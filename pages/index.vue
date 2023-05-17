@@ -11,8 +11,8 @@
         <Tab name="first" title="View genes">
           <div class="py-2">
             <Input
-              placeholder="enter gene name or ENSEMBL ID"
-              label="Gene name"
+              placeholder="Enter a gene name, e.g. ERBB2"
+              label="Search for a gene"
               v-model.trim="geneSearchTerm"
               @input="updateSearchResults"
             >
