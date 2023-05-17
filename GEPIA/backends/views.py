@@ -176,7 +176,6 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         plt.close('all')
         buf.seek(0)
         res = FileResponse(buf, content_type='image/png')
-        buf.close()
         gc.collect()
         return res
 
@@ -190,7 +189,6 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         plt.close('all')
         buf.seek(0)
         res = FileResponse(buf, content_type='image/png')
-        buf.close()
         gc.collect()
         return res
 
