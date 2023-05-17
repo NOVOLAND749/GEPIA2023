@@ -1,7 +1,9 @@
 <template>
   <div>
     <header>
-      <Navbar class="bg-white shadow-md">
+      <Navbar
+        class="fixed w-full bg-white bg-opacity-50 backdrop-blur-sm shadow-md z-50"
+      >
         <template #logo>
           <NuxtLink to="/">
             <NavbarLogo
@@ -36,12 +38,12 @@
 
     <Sidebar class="z-10" />
 
-    <div class="mb-20">
+    <div class="py-20">
       <slot></slot>
     </div>
 
     <footer
-      class="fixed bottom-0 z-20 border-t w-full bg-transparent backdrop-blur-sm shadow-3xl"
+      class="fixed bottom-0 z-50 border-t w-full bg-transparent bg-white bg-opacity-50 backdrop-blur-sm shadow-3xl"
     >
       <div class="w-full mx-auto p-4 text-center">
         2023 &copy; Yifei Hu, Nan Huang. All rights reserved.

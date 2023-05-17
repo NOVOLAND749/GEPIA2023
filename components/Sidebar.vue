@@ -1,6 +1,9 @@
 <template>
-  <div class="absolute left-0 max-w-sm mt-2 ml-2 flex flex-row">
-    <div v-if="showSidebar" class="mb-20">
+  <div class="fixed left-0 top-16 max-w-sm flex flex-row">
+    <div
+      v-if="showSidebar"
+      class="px-2 py-4 max-h-[calc(100vh-7rem)] overflow-y-scroll"
+    >
       <div v-if="abbrsPending" class="w-full">
         <div class="w-full mx-auto">
           <Spinner size="8" color="white" />
@@ -32,7 +35,10 @@
         </Accordion>
       </div>
     </div>
-    <div @click="showSidebar = !showSidebar" class="cursor-pointer">
+    <div
+      @click="showSidebar = !showSidebar"
+      class="cursor-pointer h-[calc(100vh-7rem)] flex justify-center items-center hover:bg-white hover:bg-opacity-50 hover:shadow-md hover:backdrop-blur-[1px]"
+    >
       <Icon
         name="material-symbols:chevron-right-rounded"
         size="32"
