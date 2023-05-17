@@ -5,10 +5,16 @@ export default defineNuxtConfig({
     ["@pinia/nuxt", { autoImports: ["defineStore", "acceptHMRUpdate"] }],
     "nuxt-icon",
   ],
+
   imports: {
     dirs: ["stores"],
   },
+
   runtimeConfig: {
     apiBase: process.env.API_BASE_URL,
+  },
+
+  devtools: {
+    enabled: true,
   },
 });
