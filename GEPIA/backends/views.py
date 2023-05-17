@@ -171,7 +171,7 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         fig = pl.stripplot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        plt.close(fig)
+        plt.close('all')
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
@@ -182,7 +182,7 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         fig = pl.bar_plot()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        plt.close(fig)
+        plt.close('all')
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
