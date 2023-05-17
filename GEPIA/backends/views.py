@@ -1,3 +1,5 @@
+import gc
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -173,6 +175,7 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
+        gc.collect()
         return FileResponse(buf, content_type='image/png')
 
 @api_view(['GET'])
@@ -184,6 +187,7 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
+        gc.collect()
         return FileResponse(buf, content_type='image/png')
 
 @api_view(['GET'])
@@ -211,7 +215,7 @@ def box_plot(request,gene_name,input_str,format = 'image/png'):
         fig = boxplot(df=df,x='disease',y='count',hue='type',box_pairs=box_pairs)
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
-        plt.close(fig)
+        plt.close('all')
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
 
