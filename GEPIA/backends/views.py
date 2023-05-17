@@ -175,8 +175,10 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
+        res = FileResponse(buf, content_type='image/png')
+        buf.close()
         gc.collect()
-        return FileResponse(buf, content_type='image/png')
+        return res
 
 @api_view(['GET'])
 def general_plot_bar(request,gene_name,format = 'image/png'):
@@ -187,8 +189,10 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
+        res = FileResponse(buf, content_type='image/png')
+        buf.close()
         gc.collect()
-        return FileResponse(buf, content_type='image/png')
+        return res
 
 @api_view(['GET'])
 def box_plot(request,gene_name,input_str,format = 'image/png'):
