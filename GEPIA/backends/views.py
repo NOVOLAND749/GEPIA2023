@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
-from django.http import FileResponse
+from django.http import FileResponse,HttpResponse
 # from rest_framework.pagination import PageNumberPagination
 from django.core.exceptions import MultipleObjectsReturned
 import numpy as np
@@ -171,26 +171,40 @@ def general_plot_strip(request,gene_name,format = 'image/png'):
     pl = GenePlot(gene_name)
     if request.method == "GET":
         fig = pl.stripplot()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        plt.close('all')
-        buf.seek(0)
-        res = FileResponse(buf, content_type='image/png')
-        gc.collect()
-        return res
+        # buf = io.BytesIO()
+        # fig.savefig(buf, format='png')
+        # plt.close('all')
+        # buf.seek(0)
+        # gc.collect()
+        # return FileResponse(buf, content_type='image/png')
+        with io.BytesIO() as buf:
+            fig.savefig(buf, format='png')
+            plt.clf()  # clear the current figure...
+            plt.close('all')
+            buf.seek(0)
+            gc.collect()
+            response = HttpResponse(content=buf.getvalue(), content_type='image/png')
+            return response
 
 @api_view(['GET'])
 def general_plot_bar(request,gene_name,format = 'image/png'):
     pl = GenePlot(gene_name)
     if request.method == "GET":
         fig = pl.bar_plot()
-        buf = io.BytesIO()
-        fig.savefig(buf, format='png')
-        plt.close('all')
-        buf.seek(0)
-        res = FileResponse(buf, content_type='image/png')
-        gc.collect()
-        return res
+        # buf = io.BytesIO()
+        # fig.savefig(buf, format='png')
+        # plt.close('all')
+        # buf.seek(0)
+        # gc.collect()
+        # return HttpResponse(buf.getvalue(), content_type='image/png')
+        with io.BytesIO() as buf:
+            fig.savefig(buf, format='png')
+            plt.clf()  # clear the current figure...
+            plt.close('all')
+            buf.seek(0)
+            gc.collect()
+            response = HttpResponse(content=buf.getvalue(), content_type='image/png')
+            return response
 
 @api_view(['GET'])
 def box_plot(request,gene_name,input_str,format = 'image/png'):
