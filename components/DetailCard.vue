@@ -30,11 +30,10 @@
     <div class="cardEntry">
       <h4>External links</h4>
       <div class="flex flex-row flex-wrap gap-y-2.5 w-full py-2">
-        <a
+        <NuxtLink
           v-for="{ name, link } in externalLinks"
           :href="link"
           target="_blank"
-          rel="noopener noreferrer"
         >
           <Badge>
             <template #icon>
@@ -42,7 +41,7 @@
             </template>
             {{ name }}
           </Badge>
-        </a>
+        </NuxtLink>
       </div>
     </div>
   </div>

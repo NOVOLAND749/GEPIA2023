@@ -22,7 +22,7 @@
               scope="row"
               class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
             >
-              <a
+              <NuxtLink
                 :href="
                   geneNameIndex == 0 ? `/?gene=${entry[tableCols[0].key]}` : '#'
                 "
@@ -31,17 +31,18 @@
                   'text-primary': geneNameIndex == 0,
                 }"
                 target="_blank"
-                rel="noopener noreferrer"
               >
                 {{ entry[tableCols[0].key] }}
-              </a>
+              </NuxtLink>
             </th>
             <td
               class="px-6 py-4"
               v-for="[i, col] in tableCols.slice(1).entries()"
             >
-              <a
-                :href="geneNameIndex == i + 1 ? `/?gene=${entry[col.key]}` : '#'"
+              <NuxtLink
+                :href="
+                  geneNameIndex == i + 1 ? `/?gene=${entry[col.key]}` : '#'
+                "
                 :class="{
                   'cursor-default pointer-events-none': !(
                     geneNameIndex ==
@@ -53,7 +54,7 @@
                 rel="noopener noreferrer"
               >
                 {{ entry[col.key] }}
-              </a>
+              </NuxtLink>
             </td>
           </tr>
         </tbody>
