@@ -9,7 +9,7 @@
           v-html="yLabel"
         ></p>
       </div>
-      <img class="flex-auto w-full" :src="imageUrl" loading="lazy" />
+      <img class="flex-auto w-4/5" :src="imageUrl" loading="lazy" />
     </div>
   </div>
 </template>
