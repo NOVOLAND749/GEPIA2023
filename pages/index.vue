@@ -8,7 +8,7 @@
         GEPIA 2023
       </h1>
       <Tabs v-model="activeTab" variant="underline">
-        <Tab name="first" title="View genes">
+        <Tab name="first" title="Gene view">
           <div class="py-2">
             <Input
               placeholder="Enter a gene name, e.g. ERBB2"
