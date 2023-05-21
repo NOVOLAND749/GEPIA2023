@@ -17,4 +17,5 @@ urlpatterns = format_suffix_patterns([
     url(r'^gene_plot/bar/(?P<gene_name>[^/]+)/$',views.general_plot_bar,name='gene-plot-bar'),
     url(r'^box_plot/(?P<gene_name>[^/]+)/(?P<input_str>[^/]+)/$',views.box_plot,name='gene-plot-box'),
     url(r'^global_variable/(?P<variable>[^/]+)/$',views.get_global_variable,name='global-variable'),
+    url(r'^sample_number/$',views.get_sample_number,name='sample-number'),
 ])
