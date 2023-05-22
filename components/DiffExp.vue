@@ -46,6 +46,13 @@
         </Input>
       </div>
     </div>
+    <div v-if="isValid" class="pt-2 px-2">
+      <ExpDetail
+        :dataset-name="datasetSelection!.db_name"
+        :log2-f-c="log2FCNumber"
+        :q-value="qValueNumber"
+      ></ExpDetail>
+    </div>
 
     <Teleport to="body">
       <div class="absolute top-20 right-0 flex flex-col gap-2 m-2">
@@ -104,12 +111,18 @@ const qValue = ref("0.01");
 const log2FCNumber = computed(() => {
   return parseFloat(log2FC.value);
 });
+const isValidLog2FC = computed(() => {
+  return log2FCNumber.value > 0.0;
+});
 const qValueNumber = computed(() => {
   return parseFloat(qValue.value);
 });
+const isValidQValue = computed(() => {
+  return qValueNumber.value > 0.0 && qValueNumber.value < 1.0;
+});
 
 watch(log2FCNumber, (log2FCNumber) => {
-  if (log2FCNumber <= 0.0) {
+  if (!isValidLog2FC.value) {
     toastProvider({
       type: "danger",
       message: `The log₂ Fold-Change cutoff value ${log2FCNumber} must be positive.`,
@@ -118,12 +131,20 @@ watch(log2FCNumber, (log2FCNumber) => {
 });
 
 watch(qValueNumber, (qValueNumber) => {
-  if (qValueNumber <= 0.0 || qValueNumber >= 1.0) {
+  if (!isValidQValue.value) {
     toastProvider({
       type: "danger",
       message: `The Q-value cutoff value ${qValueNumber} must be between 0 and 1.`,
     });
   }
+});
+
+const isValid = computed(() => {
+  return (
+    isValidLog2FC.value &&
+    isValidQValue.value &&
+    datasetSelection.value !== null
+  );
 });
 
 onBeforeMount(async () => {
