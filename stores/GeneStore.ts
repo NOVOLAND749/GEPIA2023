@@ -5,11 +5,17 @@ export const useGeneStore = defineStore("GeneStore", () => {
     localStorage.setItem("geneList", JSON.stringify(geneList.value));
   }
 
-  async function loadFromLocalStorage() {
+  function loadFromLocalStorage() {
     const data = localStorage.getItem("geneList");
     if (data) {
       geneList.value = JSON.parse(data);
-    } else {
+    }
+  }
+
+  async function load() {
+    if (geneList.value.length) return;
+    loadFromLocalStorage();
+    if (!geneList.value.length) {
       const result = await $fetch("/api/getGeneList");
       if (result) {
         geneList.value = result;
@@ -18,7 +24,7 @@ export const useGeneStore = defineStore("GeneStore", () => {
     }
   }
 
-  return { geneList, saveToLocalStorage, loadFromLocalStorage };
+  return { geneList, load };
 });
 
 if (import.meta.hot) {
