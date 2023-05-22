@@ -100,7 +100,7 @@ onBeforeMount(async () => {
   if (isExactMatch.value) {
     geneDetail.value = null;
     if (geneSearchTerm.value) {
-      geneDetail.value = await $fetch(
+      geneDetail.value = await $fetch<GeneDetailType>(
         `/api/getGeneDetail/${geneSearchTerm.value}`
       );
     }
