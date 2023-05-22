@@ -27,7 +27,7 @@
         <Input
           placeholder="1.00"
           label="|log₂ Fold-Change| Cutoff"
-          v-model.number="log2FC"
+          v-model.lazy.trim.number="log2FC"
         >
           <template #prefix>
             <Icon name="material-symbols:123" size="24"></Icon>
@@ -38,7 +38,7 @@
         <Input
           placeholder="1.00"
           label="Q-value Cutoff"
-          v-model.number="qValue"
+          v-model.lazy.trim.number="qValue"
         >
           <template #prefix>
             <Icon name="material-symbols:123" size="24"></Icon>
@@ -48,7 +48,7 @@
     </div>
 
     <Teleport to="body">
-      <div class="absolute top-20 right-0 flex flex-col gap-2">
+      <div class="absolute top-20 right-0 flex flex-col gap-2 m-2">
         <Toast
           v-for="toast in toastList"
           :type="toast.type"
