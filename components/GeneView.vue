@@ -26,19 +26,15 @@
         </ListGroupItem>
       </ListGroup>
     </div>
-    <div v-if="geneDetail" class="pt-2 px-2">
-      <GeneDetail :gene="geneDetail"></GeneDetail>
-    </div>
-    <div v-else-if="isExactMatch" class="w-full mx-auto pt-3">
-      <Spinner size="12" color="white" />
+    <div v-if="isExactMatch" class="pt-2 px-2">
+      <GeneDetail :gene-name="geneSearchTerm"></GeneDetail>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { Spinner, ListGroup, ListGroupItem, Input } from "flowbite-vue";
+import { ListGroup, ListGroupItem, Input } from "flowbite-vue";
 import Fuse from "fuse.js";
-import GeneDetailType from "~/types/GeneDetailType";
 
 const route = useRoute();
 const router = useRouter();
@@ -75,19 +71,6 @@ const updateSearchResults = () => {
   }, 500);
 };
 
-const geneDetail = ref(null as GeneDetailType | null);
-
-watch(isExactMatch, async (isExactMatch) => {
-  if (isExactMatch) {
-    geneDetail.value = null;
-    if (geneSearchTerm.value) {
-      geneDetail.value = await $fetch<GeneDetailType>(
-        `/api/getGeneDetail/${geneSearchTerm.value}`
-      );
-    }
-  }
-});
-
 onBeforeMount(async () => {
   if (!genes.value.length) {
     if (!geneStore.geneList.length) {
@@ -95,15 +78,6 @@ onBeforeMount(async () => {
     }
     genes.value = geneStore.geneList;
     geneSearch.setCollection(genes.value);
-  }
-
-  if (isExactMatch.value) {
-    geneDetail.value = null;
-    if (geneSearchTerm.value) {
-      geneDetail.value = await $fetch<GeneDetailType>(
-        `/api/getGeneDetail/${geneSearchTerm.value}`
-      );
-    }
   }
 });
 </script>
