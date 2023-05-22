@@ -191,7 +191,7 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
     pl = GenePlot(gene_name)
     if request.method == "GET":
         fig = pl.bar_plot()
-        buf = io.StringIO()
+        buf = io.BytesIO()
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
@@ -247,14 +247,6 @@ def get_global_variable(request,variable, format = None):
         except KeyError:
             raise Http404
 
-@api_view(['GET'])
-def get_sample_number(request,format=None):
-    api = DatabaseAPI(db_name='tcga',collection_name='test')
-    res = api.get_metadata(metadata_name='sample_number')
-    df = pd.DataFrame(res).astype(np.int64)
-    a = [{'Dataset':i,'Normal':j,'Tumor':k} for i,j,k in zip(df.index,df['Normal'],df['Tumor'])]
-    if request.method == "GET":
-        return Response(a)
 
 
 
