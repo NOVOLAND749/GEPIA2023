@@ -81,7 +81,7 @@ watch(isExactMatch, async (isExactMatch) => {
   if (isExactMatch) {
     geneDetail.value = null;
     if (geneSearchTerm.value) {
-      geneDetail.value = await $fetch(
+      geneDetail.value = await $fetch<GeneDetailType>(
         `/api/getGeneDetail/${geneSearchTerm.value}`
       );
     }

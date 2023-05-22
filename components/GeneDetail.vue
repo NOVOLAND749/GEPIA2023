@@ -6,7 +6,7 @@
       <TableCard
         :title="`Genes similar to ${gene.gene_name}`"
         :description="`Score is given as the Pearson correlation between the expression of ${gene.gene_name} and that of others`"
-        :tableData="similarGenes"
+        :tableData="similarGenes || []"
         :tableCols="[
           { key: 'gene_name', name: 'Gene Name' },
           { key: 'value', name: 'Score' },
