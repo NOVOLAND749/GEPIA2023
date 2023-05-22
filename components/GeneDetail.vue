@@ -7,13 +7,13 @@
       <div class="grid grid-cols-9 gap-4">
         <DetailCard :gene="gene" class="col-span-9 md:col-span-4 h-fit" />
         <TableCard
-          v-if="similarGenes"
+          v-if="similarGenes.length"
           :title="`Genes similar to ${gene.gene_name}`"
           :description="`Score is given as the Pearson correlation between the expression of ${gene.gene_name} and that of others`"
           :tableData="similarGenes"
           :tableCols="[
-            { key: 'gene_name', name: 'Gene Name' },
-            { key: 'value', name: 'Score' },
+            { key: 'gene_name', name: 'Gene Name', precisions: null },
+            { key: 'value', name: 'Score', precisions: null },
           ]"
           :geneNameIndex="0"
           :pageSize="10"

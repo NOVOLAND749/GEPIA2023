@@ -5,7 +5,7 @@
 
     <div class="relative overflow-x-auto rounded-lg border mt-8">
       <table class="w-full text-sm text-center text-gray-500">
-        <thead class="text-sm text-gray-700 uppercase bg-gray-50 border-b">
+        <thead class="text-sm text-gray-700 bg-gray-50 border-b">
           <tr class="border-b">
             <th scope="col" class="px-6 py-3" v-for="col in tableCols">
               {{ col.name }}
@@ -53,7 +53,11 @@
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {{ entry[col.key] }}
+                {{
+                  col.precisions
+                    ? (entry[col.key] as number).toFixed(col.precisions)
+                    : entry[col.key]
+                }}
               </NuxtLink>
             </td>
           </tr>
@@ -135,7 +139,9 @@ const props = defineProps({
     default: -1,
   },
   tableCols: {
-    type: Object as PropType<{ key: string; name: string }[]>,
+    type: Object as PropType<
+      { key: string; name: string; precisions: number | null }[]
+    >,
     required: true,
   },
   pageSize: {
