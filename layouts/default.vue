@@ -8,7 +8,7 @@
           <NuxtLink to="/">
             <NavbarLogo
               alt="GEPIA logo"
-              imageUrl="http://gepia.cancer-pku.cn/assets/logo/faviconb.png"
+              imageUrl="/favicon.svg"
               class="h-full"
             />
           </NuxtLink>
