@@ -23,4 +23,7 @@ urlpatterns = format_suffix_patterns([
     url(r'^pca/visual/(?P<input_str>[^/]+)/$',views.pca_2d,name='pca-2d'),
     url(r'^pca/visual/(?P<input_str>[^/]+)/(?P<gene_str>[^/]+)/$',views.pca_2d,name='pca-elbow-plot'),
     url(r'^global_variable/(?P<variable>[^/]+)/$',views.get_global_variable,name='global-variable'),
+    url(r'^cell_prop/(?P<dataset>[^/]+)/$',views.cell_prop,name='cell-prop'),
+    url(r'^cnv/bar_plot/(?P<gene_name>[^/]+)/$',views.CNV_bar,name='cnv-bar'),
+    url(r'^cnv/venn_plot/(?P<dataset>[^/]+)/(?P<gene_str>[^/]+)/$',views.venn,name='cnv-venn'),
 ])

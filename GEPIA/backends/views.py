@@ -20,6 +20,8 @@ import numpy as np
 import pandas as pd
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+from matplotlib_venn import venn2,venn3
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -260,7 +262,7 @@ def survival_analysis(request,gene_name,input_str,High_cutoff = None,Low_cutoff 
                 df = pd.concat(dfs)
             df = df[df.index.isin(sample_info.index)]
             obs_id = sample_info.loc[df.index,'obs_id']
-            gene_exp = np.array(api.read_table_gene_by_var(gene_id='ERBB2'))[np.array(obs_id)]
+            gene_exp = np.array(api.read_table_gene_by_var(gene_id=gene_name))[np.array(obs_id)]
             if High_cutoff is None:
                 arr = gene_exp>np.median(gene_exp)
                 df['factor'] = ['High' if a else 'Low' for a in arr]
@@ -304,6 +306,8 @@ def pca(input_str,gene_str=None):
         gene_list = gene_str.split('&')
         if len(gene_list) < 5:
             raise ImproperlyConfigured("Please Select Enough genes of interest")
+        elif len(gene_list) > 500:
+            raise ImproperlyConfigured("Too many genes, please select less than 500 genes")
     arrs = []
     Type = []
     for dataset in datasets:
@@ -347,13 +351,110 @@ def pca_2d(request,input_str,gene_str=None,format = 'image/png'):
         return FileResponse(buf, content_type='image/png')
 
 
+@api_view(['GET'])
+def cell_prop(request,dataset,format = 'image/png'):
+    if request.method == 'GET':
+        dfs = []
+        api = DatabaseAPI(db_name='celltype', collection_name='test')
+        df = pd.DataFrame(api.get_metadata(metadata_name=f'TCGA-{dataset}-celltype'))
+        dfs.append(df)
+        df = pd.concat(dfs)
+        fig,ax = plt.subplots(figsize=(10,8))
+        sns.boxplot(df)
+        ax.set_xlabel('Cell Group')
+        ax.set_ylabel('Cell Proportion')
+        ax.set_title(f'Cell Proportion in Dataset {dataset}')
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close('all')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
+
+
+@api_view(['GET'])
+def CNV_bar(request, gene_name, format = 'image/png'):
+    if request.method == 'GET':
+        match = {0:'Normal',1:'Amplification',-1:'Deletion'}
+        api = DatabaseAPI(db_name='CNV', collection_name='test')
+        samples = []
+        vals = []
+        disease = []
+        for collection in api.db.list_collection_names():
+            res = api.read_metadata(metadata_name=collection,key=gene_name)
+            samples += res.keys()
+            vals += res.values()
+            disease += [collection.split('-')[1]] * len(res.keys())
+        df = pd.DataFrame({'sample':samples,'value':vals,'disease':disease})
+        df['status'] = df['value'].map(match)
+        df2 = pd.DataFrame(df.groupby(['disease','status']).size())
+        df3 = df2.groupby(level=0).apply(lambda x:100 * x / float(x.sum()))
+        df3 = df3.droplevel(0)
+        df3 = df3.unstack(level=1)
+        df3.columns = ['Amplification','Deletion','Normal']
+        df3.drop(columns=['Normal'],inplace=True)
+        fig,ax = plt.subplots(figsize=(10,8))
+        df3.plot.bar(ax=ax)
+        plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
+        ax.set_ylabel('Percentage of samples')
+        ax.set_title(f'CNVs covering in gene {gene_name}')
+        plt.tight_layout()
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close('all')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
+
+@api_view(['GET'])
+def venn(request,dataset,gene_str,format= 'img/png'):
+    if request.method == 'GET':
+        gene_list = gene_str.split('&')
+        if len(gene_list) == 2:
+            fig = venn_2(dataset,gene_list)
+        elif len(gene_list) ==3:
+            fig = venn_3(dataset,gene_list)
+        else:
+            raise ImproperlyConfigured("Please Select 2 or 3 genes of interest")
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close('all')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
 
 
 
+def venn_2(dataset,gene_list):
+    api = DatabaseAPI(db_name='CNV', collection_name='test')
+    match = {0: 'Normal', 1: 'Amplification', -1: 'Deletion'}
+    res = api.query_metadata(metadata_name=f'TCGA-{dataset}-CNV', keys=gene_list)
+    fig, axes = plt.subplots(1, 3, figsize=(10, 8))
+    dfs = [pd.DataFrame(v.items(), columns=['sample_id', 'exp']) for v in res.values()]
+    for df in dfs:
+        df['status'] = df['exp'].map(match)
+    STATUS = ['Normal', 'Amplification', 'Deletion']
+    for status, ax in zip(STATUS, axes.flatten()):
+        a, b = [set(df[df['status'] == status]["sample_id"]) for df in dfs]
+        total = len(a.union(b))
+        venn2([a, b], tuple(gene_list), subset_label_formatter=lambda x: f"{(x / total):1.0%}", ax=ax)
+        ax.set_title(status)
+    plt.suptitle(f"Venn Diagram of CNV in dataset {dataset}")
+    return fig
 
-
-
-
+def venn_3(dataset,gene_list):
+    api = DatabaseAPI(db_name='CNV', collection_name='test')
+    match = {0: 'Normal', 1: 'Amplification', -1: 'Deletion'}
+    res = api.query_metadata(metadata_name=f'TCGA-{dataset}-CNV', keys=gene_list)
+    fig, axes = plt.subplots(1, 3, figsize=(10, 8))
+    dfs = [pd.DataFrame(v.items(), columns=['sample_id', 'exp']) for v in res.values()]
+    for df in dfs:
+        df['status'] = df['exp'].map(match)
+    STATUS = ['Normal', 'Amplification', 'Deletion']
+    for status, ax in zip(STATUS, axes.flatten()):
+        a, b, c = [set(df[df['status'] == status]["sample_id"]) for df in dfs]
+        total = len(a.union(b).union(c))
+        venn3([a, b, c], tuple(gene_list), subset_label_formatter=lambda x: f"{(x / total):1.0%}", ax=ax)
+        ax.set_title(status)
+    plt.suptitle(f"Venn Diagram of CNV in dataset {dataset}")
+    return fig
 
 
 @api_view(['GET'])

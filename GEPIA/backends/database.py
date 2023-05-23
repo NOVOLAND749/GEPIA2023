@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Any, List, Tuple
+from typing import Optional, Dict, Any, List, Tuple,Union
 
 import numpy as np
 import pymongo
@@ -196,7 +196,7 @@ class DatabaseAPI(Database):
     def read_metadata(self,
                       key: str,
                       metadata_name: str = "metadata",
-                      ) -> list:
+                      ) -> Union[list,Dict]:
         collection_name = metadata_name
         self.collection = self.db[collection_name]
         res = self.find_one({"key":key})
@@ -231,7 +231,7 @@ class DatabaseAPI(Database):
 
     def query_metadata(self,
                        keys : List[str],
-                       metadata_name: str = "metadata") -> Dict[str, list]:
+                       metadata_name: str = "metadata") -> Dict[str, Union[Dict,list]]:
         collection_name = metadata_name
         self.collection = self.db[collection_name]
         res = self.find_many({"key": {"$in": keys}})
