@@ -47,6 +47,7 @@ class GenePlot(object):
         arr = 2 ** arr - 1
         self.collection_name = "sample_info"
         df = pd.DataFrame(self.api.get_metadata(self.collection_name))
+        df.drop(columns=["obs_id"],inplace=True)
         df[self.gene_name] = arr
         mean_df = df.groupby(["Disease", "Type"]).mean()
         unstack_df = mean_df.unstack (level=1).fillna(0.0)

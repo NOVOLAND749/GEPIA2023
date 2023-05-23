@@ -397,6 +397,11 @@ def CNV_bar(request, gene_name, format = 'image/png'):
         plt.legend(bbox_to_anchor=(1.01, 1), loc='upper left', borderaxespad=0)
         ax.set_ylabel('Percentage of samples')
         ax.set_title(f'CNVs covering in gene {gene_name}')
+        # ax.set_xticklabels(df['disease'].unique(),rotation=45, ha='right', fontsize=8)
+
+
+        # ax.tick_params(axis='x', rotation=30)
+        # fig.autofmt_xdate(bottom=0.2, rotation=30, ha='right')
         plt.tight_layout()
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
