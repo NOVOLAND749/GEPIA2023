@@ -246,7 +246,9 @@ const generatePlotLink = () => {
   }
   plotLink.value = `/api/getSurvivalPlot/${
     geneSearchTerm.value
-  }/${datasetSelection.value.map((e) => e.db_name).join("&")}/`;
+  }/${datasetSelection.value.map((e) => e.db_name).join("&")}/?CutoffHigh=${
+    cutoffHighNumber.value
+  }&CutoffLow=${cutoffLowNumber.value}`;
 };
 
 onBeforeMount(async () => {
