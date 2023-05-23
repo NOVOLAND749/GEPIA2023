@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="flex flex-row gap-2">
-      <div class="flex-grow min-w-fit my-auto">
+    <div class="flex flex-row gap-2 px-2">
+      <div class="flex-grow min-w-fit my-auto text-lg">
         Dataset:
         <Dropdown placement="bottom">
           <template #trigger="{ toggle }">
-            <Button @click="toggle">
+            <Button @click="toggle" color="alternative">
               {{ datasetSelection ? datasetSelection.db_name : "Choose one" }}
             </Button>
           </template>
