@@ -17,6 +17,9 @@
         <Tab name="third" title="GeneExp">
           <GeneExp class="py-2"></GeneExp>
         </Tab>
+        <Tab name="fourth" title="GeneSurvival">
+          <GeneSurvival class="py-2"></GeneSurvival>
+        </Tab>
       </Tabs>
     </div>
   </div>
