@@ -98,7 +98,6 @@ import {
   Dropdown,
   Button,
   Toast,
-  ToastProvider,
 } from "flowbite-vue";
 import Fuse from "fuse.js";
 import DatasetType from "~/types/DatasetType";
