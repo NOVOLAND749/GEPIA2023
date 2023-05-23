@@ -1,21 +1,10 @@
 import GeneDetailType from "~/types/GeneDetailType";
-
-const getStripPlotLink = (gene: GeneDetailType) => {
-  return `/api/getStripPlot/${gene.gene_name}`;
-};
-
-const getBarPlotLink = (gene: GeneDetailType) => {
-  return `/api/getBarPlot/${gene.gene_name}`;
-};
-
-const getCopyNumberPlotLink = (gene: GeneDetailType) => {
-  return `/api/getCopyNumberPlot/${gene.gene_name}`;
-};
+import { SynthUrl } from "./SynthUrl";
 
 export function getGenePlotLinks(gene: GeneDetailType) {
   return {
-    StripPlot: getStripPlotLink(gene),
-    BarPlot: getBarPlotLink(gene),
-    CopyNumberPlot: getCopyNumberPlotLink(gene),
+    StripPlot: SynthUrl(["getStripPlot"], { gene: gene.gene_name }),
+    BarPlot: SynthUrl(["getBarPlot"], { gene: gene.gene_name }),
+    CopyNumberPlot: SynthUrl(["getCopyNumberPlot"], { gene: gene.gene_name }),
   };
 }

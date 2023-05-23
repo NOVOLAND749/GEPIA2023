@@ -1,10 +1,13 @@
 export default defineEventHandler(async (event) => {
-  const datasetName = event.context.params!.datasetName;
-  const { genes } = getQuery(event);
+  const { gene, datasets, high, low } = getQuery(event);
   const { apiBase } = useRuntimeConfig();
   const blob = await $fetch<Blob>(
     apiBase +
-      `/cnv/venn_plot/${datasetName}/${genes?.toString().split(",").join("&")}`
+      `/survival_analysis/${gene}/${datasets
+        ?.toString()
+        .replaceAll(",", "&")}/${high == null ? 50.0 : high}&${
+        low == null ? 50.0 : low
+      }/`
   );
   const arrayBuffer = blob.arrayBuffer();
   const buffer = Buffer.from(await arrayBuffer);

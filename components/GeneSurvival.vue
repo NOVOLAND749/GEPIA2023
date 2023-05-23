@@ -244,11 +244,12 @@ const generatePlotLink = () => {
     });
     return;
   }
-  plotLink.value = `/api/getSurvivalPlot/${
-    geneSearchTerm.value
-  }/${datasetSelection.value.map((e) => e.db_name).join("&")}/?CutoffHigh=${
-    cutoffHighNumber.value
-  }&CutoffLow=${cutoffLowNumber.value}`;
+  plotLink.value = SynthUrl(["getSurvivalPlot"], {
+    gene: geneSearchTerm.value,
+    datasets: datasetSelection.value.map((e) => e.db_name),
+    high: cutoffHighNumber.value,
+    low: cutoffLowNumber.value,
+  });
 };
 
 onBeforeMount(async () => {

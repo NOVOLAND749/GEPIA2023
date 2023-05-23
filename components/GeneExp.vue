@@ -167,9 +167,10 @@ const generatePlotLink = () => {
     });
     return;
   }
-  plotLink.value = `/api/getBoxPlot/${
-    geneSearchTerm.value
-  }/${datasetSelection.value.map((e) => e.db_name).join("&")}/`;
+  plotLink.value = SynthUrl(["getBoxPlot"], {
+    gene: geneSearchTerm.value,
+    datasets: datasetSelection.value.map((e) => e.db_name),
+  });
 };
 
 const updateDatasetSelection = (dataset: DatasetType) => {

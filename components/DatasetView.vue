@@ -35,7 +35,9 @@ const datasetSelection = ref(null as DatasetType | null);
 
 const plotLink = computed(() => {
   if (!datasetSelection.value) return "";
-  return `/api/getCellTypePlot/${datasetSelection.value.db_name}/`;
+  return SynthUrl(["getCellTypePlot"], {
+    dataset: datasetSelection.value.db_name,
+  });
 });
 
 onBeforeMount(async () => {

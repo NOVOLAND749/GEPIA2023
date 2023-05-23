@@ -75,10 +75,12 @@ const genePlotLinks = computed(() => {
 const similarGenes = ref<SimilarGeneType[]>([]);
 
 onMounted(async () => {
-  gene.value = await $fetch<GeneDetailType>(`/api/getGeneDetail/${geneName}`);
-  genePending.value = false;
-  similarGenes.value = await $fetch<SimilarGeneType[]>(
-    `/api/getSimilarGenes/${gene.value.gene_name}`
+  gene.value = await $fetch<GeneDetailType>(
+    SynthUrl(["getGeneDetail", geneName])
   );
+  similarGenes.value = await $fetch<SimilarGeneType[]>(
+    SynthUrl(["getSimilarGenes", geneName])
+  );
+  genePending.value = false;
 });
 </script>

@@ -1,9 +1,11 @@
 export default defineEventHandler(async (event) => {
-  const genesSelection = event.context.params!.genesSelection;
-  const datasetsSelection = event.context.params!.datasetsSelection;
+  const { genes, datasets } = getQuery(event);
   const { apiBase } = useRuntimeConfig();
   const blob = await $fetch<Blob>(
-    apiBase + `/pca/visual/${datasetsSelection}/${genesSelection}/`
+    apiBase +
+      `/pca/visual/${datasets?.toString().replaceAll(",", "&")}/${genes
+        ?.toString()
+        .replaceAll(",", "&")}/`
   );
   const arrayBuffer = blob.arrayBuffer();
   const buffer = Buffer.from(await arrayBuffer);

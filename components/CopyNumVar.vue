@@ -183,9 +183,10 @@ const generatePlotLink = () => {
     });
     return;
   }
-  plotLink.value = `/api/getVennDiagramPlot/${
-    datasetSelection.value.db_name
-  }/?genes=${geneList.value.join(",")}`;
+  plotLink.value = SynthUrl(["getVennDiagramPlot"], {
+    genes: geneList.value,
+    dataset: datasetSelection.value.db_name,
+  });
 };
 
 onBeforeMount(async () => {

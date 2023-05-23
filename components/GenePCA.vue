@@ -225,12 +225,14 @@ const generatePlotLink = () => {
     });
     return;
   }
-  elbowPlotLink.value = `/api/getElbowPlot/${datasetSelection.value.join(
-    "&"
-  )}/${geneList.value.join("&")}/`;
-  scatterPlotLink.value = `/api/getPCAScatterPlot/${datasetSelection.value.join(
-    "&"
-  )}/${geneList.value.join("&")}/`;
+  elbowPlotLink.value = SynthUrl(["getElbowPlot"], {
+    datasets: datasetSelection.value,
+    genes: geneList.value,
+  });
+  scatterPlotLink.value = SynthUrl(["getPCAScatterPlot"], {
+    datasets: datasetSelection.value,
+    genes: geneList.value,
+  });
 };
 
 onBeforeMount(async () => {

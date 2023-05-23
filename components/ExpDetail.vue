@@ -48,7 +48,7 @@ const pageSize = ref(10);
 
 onMounted(async () => {
   diffExpProfile.value = await $fetch<DiffExpType[]>(
-    `/api/getDiffExp/${datasetName}/?log2FC=${log2FC}&qValue=${qValue}`
+    SynthUrl(["getDiffExp", datasetName], { log2FC, qValue })
   );
   pending.value = false;
 });
