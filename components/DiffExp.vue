@@ -46,11 +46,13 @@
         </Input>
       </div>
     </div>
-    <div v-if="isValid" class="pt-2 px-2">
+    <div class="pt-2 px-2">
       <ExpDetail
-        :dataset-name="datasetSelection!.db_name"
+        v-if="datasetSelection"
+        :dataset-name="datasetSelection.db_name"
         :log2-f-c="log2FCNumber"
         :q-value="qValueNumber"
+        :key="datasetSelection.db_name + log2FCNumber + qValueNumber"
       ></ExpDetail>
     </div>
 
