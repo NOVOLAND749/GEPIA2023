@@ -26,6 +26,9 @@
         <Tab name="sixth" title="DatasetView">
           <DatasetView class="py-2"></DatasetView>
         </Tab>
+        <Tab name="seventh" title="CopyNumVar">
+          <CopyNumVar class="py-2"></CopyNumVar>
+        </Tab>
       </Tabs>
     </div>
   </div>
