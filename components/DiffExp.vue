@@ -30,7 +30,7 @@
           v-model.lazy.trim.number="log2FC"
         >
           <template #prefix>
-            <Icon name="material-symbols:123" size="24"></Icon>
+            <Icon name="material-symbols:numbers" size="24"></Icon>
           </template>
         </Input>
       </div>
@@ -41,7 +41,7 @@
           v-model.lazy.trim.number="qValue"
         >
           <template #prefix>
-            <Icon name="material-symbols:123" size="24"></Icon>
+            <Icon name="material-symbols:numbers" size="24"></Icon>
           </template>
         </Input>
       </div>
