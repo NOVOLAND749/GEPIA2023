@@ -14,6 +14,9 @@
         <Tab name="second" title="DiffExp">
           <DiffExp class="py-2"></DiffExp>
         </Tab>
+        <Tab name="third" title="GeneExp">
+          <GeneExp class="py-2"></GeneExp>
+        </Tab>
       </Tabs>
     </div>
   </div>
