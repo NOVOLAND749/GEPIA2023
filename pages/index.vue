@@ -23,6 +23,9 @@
         <Tab name="fifth" title="GenePCA">
           <GenePCA class="py-2"></GenePCA>
         </Tab>
+        <Tab name="sixth" title="DatasetView">
+          <DatasetView class="py-2"></DatasetView>
+        </Tab>
       </Tabs>
     </div>
   </div>
