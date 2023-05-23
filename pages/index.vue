@@ -20,6 +20,9 @@
         <Tab name="fourth" title="GeneSurvival">
           <GeneSurvival class="py-2"></GeneSurvival>
         </Tab>
+        <Tab name="fifth" title="GenePCA">
+          <GenePCA class="py-2"></GenePCA>
+        </Tab>
       </Tabs>
     </div>
   </div>
