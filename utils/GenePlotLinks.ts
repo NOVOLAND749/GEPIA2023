@@ -8,6 +8,14 @@ const getBarPlotLink = (gene: GeneDetailType) => {
   return `/api/getBarPlot/${gene.gene_name}`;
 };
 
+const getCopyNumberPlotLink = (gene: GeneDetailType) => {
+  return `/api/getCopyNumberPlot/${gene.gene_name}`;
+};
+
 export function getGenePlotLinks(gene: GeneDetailType) {
-  return { StripPlot: getStripPlotLink(gene), BarPlot: getBarPlotLink(gene) };
+  return {
+    StripPlot: getStripPlotLink(gene),
+    BarPlot: getBarPlotLink(gene),
+    CopyNumberPlot: getCopyNumberPlotLink(gene),
+  };
 }

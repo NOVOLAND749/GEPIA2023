@@ -25,7 +25,7 @@
         :title="`Expression profile of ${gene.gene_name} across all tumor samples and
     paired normal tissues`"
         description="Each dot represents an expression of certain sample"
-        :imageUrl="genePlotLinks.StripPlot"
+        :imageUrl="genePlotLinks!.StripPlot"
         yLabel="<b>T</b>ranscripts <b>P</b>er <B>M</B>illion (<b>TPM</b>)"
         class="mt-4"
       />
@@ -34,8 +34,15 @@
         :title="`Expression profile of ${gene.gene_name} across all tumor samples and
     paired normal tissues`"
         description="Bar height represents the median expression of certain sample"
-        :imageUrl="genePlotLinks.BarPlot"
+        :imageUrl="genePlotLinks!.BarPlot"
         yLabel="<b>T</b>ranscripts <b>P</b>er <B>M</B>illion (<b>TPM</b>)"
+        class="mt-4"
+      />
+
+      <PlotCard
+        :title="`Copy number variance of ${gene.gene_name} across all datasets`"
+        description="Bar height represents the percentage of samples that has a certain type of copy number variant"
+        :imageUrl="genePlotLinks!.CopyNumberPlot"
         class="mt-4"
       />
     </div>
@@ -61,13 +68,15 @@ const props = defineProps({
 const { geneName } = props;
 const gene = ref<GeneDetailType | null>(null);
 const genePending = ref(true);
-const genePlotLinks = ref<Record<string, string>>({});
+const genePlotLinks = computed(() => {
+  if (!gene.value) return null;
+  return getGenePlotLinks(gene.value);
+});
 const similarGenes = ref<SimilarGeneType[]>([]);
 
 onMounted(async () => {
   gene.value = await $fetch<GeneDetailType>(`/api/getGeneDetail/${geneName}`);
   genePending.value = false;
-  genePlotLinks.value = getGenePlotLinks(gene.value);
   similarGenes.value = await $fetch<SimilarGeneType[]>(
     `/api/getSimilarGenes/${gene.value.gene_name}`
   );
