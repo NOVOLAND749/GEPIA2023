@@ -1,5 +1,22 @@
 <template>
-  <div class="py-6 px-2 rounded-lg bg-white shadow-md border">
+  <div class="py-6 px-2 rounded-lg bg-white shadow-md border relative">
+    <div class="absolute top-2 left-2">
+      <Dropdown placement="right">
+        <template #trigger="{ toggle }">
+          <Button @click="toggle" color="alternative">
+            <Icon name="material-symbols:table-rows" size="16" />
+          </Button>
+        </template>
+        <ListGroup class="max-h-60 overflow-y-scroll">
+          <ListGroupItem
+            v-for="ps in [10, 20, 50, 100, 0]"
+            @click="actualPageSize = ps"
+          >
+            Show {{ ps ? `${ps} per page` : "All" }}
+          </ListGroupItem>
+        </ListGroup>
+      </Dropdown>
+    </div>
     <h3 class="text-lg font-bold text-center" v-html="title"></h3>
     <h4 class="text-center" v-if="description" v-html="description"></h4>
 
@@ -138,7 +155,14 @@
 </template>
 
 <script setup lang="ts">
-import { ButtonGroup, Button, Table } from "flowbite-vue";
+import {
+  ButtonGroup,
+  Button,
+  Table,
+  Dropdown,
+  ListGroup,
+  ListGroupItem,
+} from "flowbite-vue";
 
 const props = defineProps({
   title: {
@@ -175,7 +199,12 @@ const props = defineProps({
 const { title, description, tableData, tableCols, pageSize, geneNameIndex } =
   props;
 
-const totalPages = pageSize == 0 ? 1 : Math.ceil(tableData.length / pageSize);
+const actualPageSize = ref(pageSize);
+const totalPages = computed(() =>
+  actualPageSize.value == 0
+    ? 1
+    : Math.ceil(tableData.length / actualPageSize.value)
+);
 const currentPageNum = ref(1);
 
 const sortBy = ref(0);
@@ -211,10 +240,10 @@ const sortedTableData = computed(() => {
 });
 
 const slicedTableData = computed(() => {
-  if (pageSize > 0) {
+  if (actualPageSize.value > 0) {
     return sortedTableData.value.slice(
-      (currentPageNum.value - 1) * pageSize,
-      currentPageNum.value * pageSize
+      (currentPageNum.value - 1) * actualPageSize.value,
+      currentPageNum.value * actualPageSize.value
     );
   } else {
     return sortedTableData.value;
