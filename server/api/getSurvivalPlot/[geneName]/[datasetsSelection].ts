@@ -5,9 +5,9 @@ export default defineEventHandler(async (event) => {
   const { apiBase } = useRuntimeConfig();
   const blob = await $fetch<Blob>(
     apiBase +
-      `/survival_analysis/${geneName}/${datasetsSelection}/?High_cutoff=${
-        CutoffHigh == null ? 100.0 : CutoffHigh
-      }&Low_cutoff=${CutoffLow == null ? 0.0 : CutoffLow}`
+      `/survival_analysis/${geneName}/${datasetsSelection}/${
+        CutoffHigh == null ? 50.0 : CutoffHigh
+      }&${CutoffLow == null ? 50.0 : CutoffLow}/`
   );
   const arrayBuffer = blob.arrayBuffer();
   const buffer = Buffer.from(await arrayBuffer);
