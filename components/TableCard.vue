@@ -7,8 +7,29 @@
       <table class="w-full text-sm text-center text-gray-500">
         <thead class="text-sm text-gray-700 bg-gray-50 border-b">
           <tr class="border-b">
-            <th scope="col" class="px-6 py-3" v-for="col in tableCols">
-              {{ col.name }}
+            <th
+              scope="col"
+              class="px-6 py-3"
+              v-for="[idx, col] in tableCols.entries()"
+            >
+              <div
+                class="flex flex-row justify-center items-center cursor-pointer hover:text-primary"
+                @click="toggleSortBy(idx)"
+              >
+                <p>
+                  {{ col.name }}
+                </p>
+                <Icon
+                  :name="
+                    matchAscend(idx)
+                      ? 'material-symbols:trending-up'
+                      : matchDescend(idx)
+                      ? 'material-symbols:trending-down'
+                      : 'material-symbols:sort'
+                  "
+                  size="24"
+                />
+              </div>
             </th>
           </tr>
         </thead>
@@ -157,14 +178,46 @@ const { title, description, tableData, tableCols, pageSize, geneNameIndex } =
 const totalPages = pageSize == 0 ? 1 : Math.ceil(tableData.length / pageSize);
 const currentPageNum = ref(1);
 
+const sortBy = ref(0);
+const matchAscend = (idx: number) => {
+  return sortBy.value - 1 == idx;
+};
+const matchDescend = (idx: number) => {
+  return sortBy.value + 1 == -idx;
+};
+const toggleSortBy = (idx: number) => {
+  if (!matchAscend(idx) && !matchDescend(idx)) {
+    sortBy.value = idx + 1;
+  } else if (matchAscend(idx)) {
+    sortBy.value = -idx - 1;
+  } else {
+    sortBy.value = 0;
+  }
+};
+const sortedTableData = computed(() => {
+  if (sortBy.value == 0) {
+    return tableData;
+  } else {
+    const idx = Math.abs(sortBy.value) - 1;
+    const isAscend = sortBy.value > 0;
+    return tableData.sort((a, b) => {
+      if (isAscend) {
+        return a[tableCols[idx].key] > b[tableCols[idx].key] ? 1 : -1;
+      } else {
+        return a[tableCols[idx].key] < b[tableCols[idx].key] ? 1 : -1;
+      }
+    });
+  }
+});
+
 const slicedTableData = computed(() => {
   if (pageSize > 0) {
-    return tableData.slice(
+    return sortedTableData.value.slice(
       (currentPageNum.value - 1) * pageSize,
       currentPageNum.value * pageSize
     );
   } else {
-    return tableData;
+    return sortedTableData.value;
   }
 });
 </script>
