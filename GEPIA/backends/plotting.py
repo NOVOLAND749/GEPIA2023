@@ -7,7 +7,7 @@ import pymongo
 from backends.database import DatabaseAPI
 import seaborn as sns
 from statannot import add_stat_annotation
-
+import lifelines
 
 class GenePlot(object):
     def __init__(self,gene_name):
@@ -66,4 +66,42 @@ def boxplot(df,x,y,hue,box_pairs=None,**kwargs):
         add_stat_annotation(data=df, x=x, y=y, hue=hue, box_pairs=box_pairs, test='Mann-Whitney', text_format='star', loc='outside', verbose=2, ax=ax)
     sns.despine(offset=10, trim=True)
     ax.set_ylabel("log2(Count+1)")
+    return fig
+
+def survive_curve(df,gene_name,**kwargs):
+    kmf = lifelines.KaplanMeierFitter()
+    fig,ax = plt.subplots(figsize=(10, 8))
+
+    dem = (df["factor"] == "High")
+    T = df["OS.time"]
+    E = df["OS"]
+    kmf.fit(T, event_observed=E)
+
+    kmf.fit(T[dem], event_observed=E[dem], label=f"High {gene_name} counts")
+    kmf.plot_survival_function(ax=ax)
+
+    kmf.fit(T[~dem], event_observed=E[~dem], label=f"Low {gene_name} counts")
+    kmf.plot_survival_function(ax=ax)
+
+    plt.title(f"Lifespans of different expression patterns in {gene_name}")
+    ax.set_xlabel("Time (days)")
+    return fig
+
+def ElbowPlot(pca_obj):
+    fig,ax = plt.subplots(figsize=(10, 8))
+    ax.bar(range(1,pca_obj.n_components+1),pca_obj.explained_variance_ratio_)
+    ax.set_xlabel("Number of components")
+    ax.set_ylabel("Percentage of variance")
+    ax.set_xticks(np.arange(1, pca_obj.n_components+1, (pca_obj.n_components+1)//5))
+    ax.set_title('Variance')
+    return fig
+
+
+def PCA2DPlot(df):
+    fig,ax = plt.subplots(figsize=(10, 8))
+    sns.scatterplot(x="PC1", y="PC2", hue="Group", data=df, ax=ax,palette='Set1')
+    df.to_csv("PCA2DPlot.csv")
+    ax.set_title("PCA 2D Plot")
+    fig.tight_layout()
+    fig.savefig("PCA2DPlot.png")
     return fig

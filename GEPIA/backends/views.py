@@ -8,16 +8,18 @@ from backends.serializers import DataSetSerializer,GeneSerializer
 from django.http import Http404
 from backends.database import DatabaseAPI
 from rest_framework.decorators import api_view
-from backends.plotting import GenePlot,boxplot
+from backends.plotting import GenePlot,boxplot,survive_curve,ElbowPlot,PCA2DPlot
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import io
 from django.http import FileResponse,HttpResponse
 # from rest_framework.pagination import PageNumberPagination
-from django.core.exceptions import MultipleObjectsReturned
+from django.core.exceptions import MultipleObjectsReturned,ObjectDoesNotExist,ImproperlyConfigured
 import numpy as np
 import pandas as pd
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 # Create your views here.
 class TCGADataSetList(APIView):
@@ -206,34 +208,150 @@ def general_plot_bar(request,gene_name,format = 'image/png'):
         #     response = HttpResponse(content=buf.getvalue(), content_type='image/png')
         #     return response
 
+
+
 @api_view(['GET'])
 def box_plot(request,gene_name,input_str,format = 'image/png'):
+    if request.method == 'GET':
+        datasets = input_str.split('&')
+        if len(datasets) > 5:
+            msg = "Too many datasets, please select less than 5 datasets"
+            return Response(msg)
+        else:
+            api = DatabaseAPI(db_name='dataset',collection_name='test')
+            count = []
+            type = []
+            disease = []
+            box_pairs = []
+            for dataset in datasets:
+                t_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-tumor')
+                n_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-normal')
+                count += t_val
+                count += n_val
+                type += ['tumor']*len(t_val)
+                type += ['normal']*len(n_val)
+                disease += [dataset]*(len(t_val)+len(n_val))
+                box_pairs.append(((dataset,'tumor'),(dataset,'normal')))
+            df = pd.DataFrame({'count':count,'type':type,'disease':disease})
+            fig = boxplot(df=df,x='disease',y='count',hue='type',box_pairs=box_pairs)
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            plt.close('all')
+            buf.seek(0)
+            return FileResponse(buf, content_type='image/png')
+
+@api_view(['GET'])
+def survival_analysis(request,gene_name,input_str,High_cutoff = None,Low_cutoff = None,format = 'image/png'):
+    if request.method == 'GET':
+        datasets = input_str.split('&')
+        if len(datasets) > 5:
+            msg = "Too many datasets, please select less than 5 datasets"
+            raise ImproperlyConfigured(msg)
+        else:
+            api = DatabaseAPI(db_name='tcga', collection_name='test')
+            sample_info = pd.DataFrame(api.get_metadata(metadata_name='sample_info'))
+            api2 = DatabaseAPI(db_name='survive_analysis',collection_name='test')
+            if len(datasets) == 1:
+                df = pd.DataFrame(api2.get_metadata(metadata_name=f'TCGA-{datasets[0]}-survival'))
+            else:
+                dfs = []
+                for dataset in datasets:
+                    dfs.append(pd.DataFrame(api2.get_metadata(metadata_name=f'TCGA-{dataset}-survival')))
+                df = pd.concat(dfs)
+            df = df[df.index.isin(sample_info.index)]
+            obs_id = sample_info.loc[df.index,'obs_id']
+            gene_exp = np.array(api.read_table_gene_by_var(gene_id='ERBB2'))[np.array(obs_id)]
+            if High_cutoff is None:
+                arr = gene_exp>np.median(gene_exp)
+                df['factor'] = ['High' if a else 'Low' for a in arr]
+
+            elif High_cutoff and Low_cutoff:
+                df['gene_expression'] = gene_exp
+                high = np.percentile(gene_exp,float(High_cutoff))
+                low = np.percentile(gene_exp,float(Low_cutoff))
+                def func(x):
+                    if x > high:
+                        return 'High'
+                    elif x < low:
+                        return 'Low'
+                    else:
+                        return 'Middle'
+                df['factor'] = df['gene_expression'].apply(func)
+                print(sum(df['factor'] == 'High'))
+                df = df[(df['factor'] == 'High') | (df['factor'] == 'Low')]
+
+
+            fig = survive_curve(df,gene_name=gene_name)
+            buf = io.BytesIO()
+            fig.savefig(buf, format='png')
+            plt.close('all')
+            buf.seek(0)
+            return FileResponse(buf, content_type='image/png')
+
+
+def pca(input_str,gene_str=None):
     datasets = input_str.split('&')
-    if len(datasets) > 5:
-        msg = "Too many datasets, please select less than 5 datasets"
-        return Response(msg)
+    # if len(datasets) > 5:
+    #     msg = "Too many datasets, please select less than 5 datasets"
+    #     raise ImproperlyConfigured(msg)
+    api = DatabaseAPI(db_name='tcga', collection_name='test')
+    api2 = DatabaseAPI(db_name='dataset', collection_name='test')
+    if gene_str is None:
+        genes = pd.DataFrame(api.get_metadata(metadata_name='gene_info')).index
+        genes = genes.sort_values()
+        gene_list = genes[3:103].to_list()
     else:
-        api = DatabaseAPI(db_name='dataset',collection_name='test')
-        count = []
-        type = []
-        disease = []
-        box_pairs = []
-        for dataset in datasets:
-            t_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-tumor')
-            n_val = api.read_metadata(key=gene_name,metadata_name=f'TCGA-{dataset}-normal')
-            count += t_val
-            count += n_val
-            type += ['tumor']*len(t_val)
-            type += ['normal']*len(n_val)
-            disease += [dataset]*(len(t_val)+len(n_val))
-            box_pairs.append(((dataset,'tumor'),(dataset,'normal')))
-        df = pd.DataFrame({'count':count,'type':type,'disease':disease})
-        fig = boxplot(df=df,x='disease',y='count',hue='type',box_pairs=box_pairs)
+        gene_list = gene_str.split('&')
+        if len(gene_list) < 5:
+            raise ImproperlyConfigured("Please Select Enough genes of interest")
+    arrs = []
+    Type = []
+    for dataset in datasets:
+        if f"TCGA-{dataset}" not in api2.db.list_collection_names():
+            raise ObjectDoesNotExist
+        else:
+            arr = pd.DataFrame(api2.query_metadata(metadata_name=f'TCGA-{dataset}',keys = gene_list)).values
+            arrs.append(arr)
+            Type += [dataset] * arr.shape[0]
+    arr = np.concatenate(arrs,axis=0)
+
+
+    arr_scaled = StandardScaler().fit_transform(arr)
+    n_component = min(50,len(gene_list))
+    pca = PCA(n_components=n_component)
+    pca_features = pca.fit_transform(arr_scaled)
+    return pca_features,pca,Type
+
+@api_view(['GET'])
+def pca_elbow(request,input_str,gene_str=None,format = 'image/png'):
+    if request.method == 'GET':
+        _pca_features,pca_obj,_type = pca(input_str,gene_str)
+        fig = ElbowPlot(pca_obj)
         buf = io.BytesIO()
         fig.savefig(buf, format='png')
         plt.close('all')
         buf.seek(0)
         return FileResponse(buf, content_type='image/png')
+
+@api_view(['GET'])
+def pca_2d(request,input_str,gene_str=None,format = 'image/png'):
+    if request.method == 'GET':
+        pca_features,pca_obj,type = pca(input_str,gene_str)
+        df = pd.DataFrame(pca_features[:,:2],columns=['PC1','PC2'])
+        df['Group'] = type
+        fig = PCA2DPlot(df)
+        buf = io.BytesIO()
+        fig.savefig(buf, format='png')
+        plt.close('all')
+        buf.seek(0)
+        return FileResponse(buf, content_type='image/png')
+
+
+
+
+
+
+
 
 
 
