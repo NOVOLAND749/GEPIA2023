@@ -183,15 +183,14 @@ const datasets = ref(datasetStore.datasetList);
 const datasetSelection = ref([] as string[]);
 
 const availableDatasets = computed(() => {
-  let filtered = datasets.value.filter(
-    (ds) =>
-      !datasetSelection.value.includes(ds.db_name + "-normal") &&
-      !datasetSelection.value.includes(ds.db_name + "-tumor")
-  );
   return [
-    ...filtered.filter((d) => d.has_normal).map((d) => d.db_name + "-normal"),
-    ...filtered.map((d) => d.db_name + "-tumor"),
-  ].sort();
+    ...datasets.value
+      .filter((d) => d.has_normal)
+      .map((d) => d.db_name + "-normal"),
+    ...datasets.value.map((d) => d.db_name + "-tumor"),
+  ]
+    .filter((d) => !datasetSelection.value.includes(d))
+    .sort();
 });
 
 const updateDatasetSelection = (dataset: string) => {
