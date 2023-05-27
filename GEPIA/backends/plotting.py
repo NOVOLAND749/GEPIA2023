@@ -76,12 +76,14 @@ def survive_curve(df,gene_name,**kwargs):
     dem = (df["factor"] == "High")
     T = df["OS.time"]
     E = df["OS"]
+    high_number = df[dem].shape[0]
+    low_number = df[~dem].shape[0]
     kmf.fit(T, event_observed=E)
 
-    kmf.fit(T[dem], event_observed=E[dem], label=f"High {gene_name} counts")
+    kmf.fit(T[dem], event_observed=E[dem], label=f"High {gene_name} counts ({high_number} samples)")
     kmf.plot_survival_function(ax=ax)
 
-    kmf.fit(T[~dem], event_observed=E[~dem], label=f"Low {gene_name} counts")
+    kmf.fit(T[~dem], event_observed=E[~dem], label=f"Low {gene_name} counts({low_number} samples)")
     kmf.plot_survival_function(ax=ax)
 
     plt.title(f"Lifespans of different expression patterns in {gene_name}")
